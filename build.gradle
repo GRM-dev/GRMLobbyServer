@@ -1,0 +1,74 @@
+apply plugin: 'java'
+apply plugin: 'pmd'
+apply plugin: 'application'
+apply plugin: 'eclipse'
+apply plugin: 'gradle-one-jar'
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+         classpath 'com.github.rholder:gradle-one-jar:1.0.4'
+    }
+}
+
+if (hasProperty("teamcity")) {
+	    version="0.0.1."+teamcity['build.number']
+	} else {
+	    version="0.0.1.n"
+	}
+group="pl.grm"
+description="Server on Sockets to connect with CSharp Clients"
+def archieveFileName="JavaSocketServer"
+mainClassName="pl.grm.tut.csharp.ServerMain"
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+dependencies {
+    compile group: 'com.google.guava', name: 'guava', version: '18.0'
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.3.2'
+    testCompile 'junit:junit:4.12'
+}
+
+jar {
+	manifest {
+		attributes 'Main-Class': mainClassName
+		attributes "Class-Path": configurations.compile.collect { it.getName() }.join(' ')
+	}
+}
+
+task execJar(type: OneJar) {
+	mainClass = mainClassName
+	 archiveName = archieveFileName+"-"+version+".jar"
+}
+
+pmd {
+  ignoreFailures = true
+  sourceSets = [sourceSets.main]
+  reportsDir = file("$project.buildDir/reports/pmd")
+  ruleSets = [
+    "java-basic",
+    "java-braces"
+  ]
+}
+
+check << {
+  File outDir = new File('build/reports/pmd/')
+  outDir.mkdirs()
+  ant.taskdef(name: 'cpd', classname: 'net.sourceforge.pmd.cpd.CPDTask',
+    classpath: configurations.pmd.asPath)
+  ant.cpd(minimumTokenCount: '100', format: 'xml',
+    outputFile: new File(outDir , 'cpd.xml')) {
+    fileset(dir: "src/main/java") {
+      include(name: '**/*.java')
+    }
+  }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.2.1'
+}
