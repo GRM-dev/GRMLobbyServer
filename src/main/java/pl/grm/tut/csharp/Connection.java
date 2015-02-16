@@ -4,33 +4,32 @@ import java.io.*;
 import java.net.*;
 
 public class Connection extends Thread {
+	private int				ID;
 	private int				port;
-	private Socket			socket;
 	private InputStream		is;
 	private OutputStream	os;
-	private ServerSocket	serverSocket;
 	private boolean			connected;
 	private boolean			initialized;
+	private Socket			socket;
 	
-	public Connection(int port) {
-		this.port = port;
+	public Connection(int id, Socket socket) {
+		this.ID = id;
+		this.socket = socket;
+		this.port = socket.getPort();
 	}
 	
 	@Override
 	public void run() {
 		if (!isConnected() && !isInitialized()) {
 			setInitialized(true);
-			establish();
+			configureConnection();
 		}
 	}
 	
-	public void establish() {
+	public void configureConnection() {
 		try {
-			serverSocket = new ServerSocket(port, 1);
-			System.out.println("Server listening on port " + port + " now");
-			socket = serverSocket.accept();
 			setConnected(true);
-			System.out.println("Connected");
+			System.out.println("Connected on port " + port);
 			is = socket.getInputStream();
 			os = socket.getOutputStream();
 			String received = receivePacket();
@@ -60,11 +59,7 @@ public class Connection extends Thread {
 	public void sendPacket(String msg) throws IOException {
 		byte[] msgBytes = msg.getBytes();
 		int msgLen = msgBytes.length;
-		byte[] msgLenBytes = new byte[4];
-		msgLenBytes[0] = (byte) (msgLen & 0xff);
-		msgLenBytes[1] = (byte) ((msgLen >> 8) & 0xff);
-		msgLenBytes[2] = (byte) ((msgLen >> 16) & 0xff);
-		msgLenBytes[3] = (byte) ((msgLen >> 24) & 0xff);
+		byte[] msgLenBytes = convertIntToBytes(msgLen);
 		os.write(msgLenBytes);
 		os.write(msgBytes);
 		System.out.println("Sended: " + msg);
@@ -86,13 +81,27 @@ public class Connection extends Thread {
 			if (socket != null) {
 				socket.close();
 			}
-			if (serverSocket != null) {
-				serverSocket.close();
-			}
 		}
 		catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public byte[] convertIntToBytes(int integer) {
+		byte[] bytes = new byte[4];
+		bytes[0] = (byte) (integer & 0xff);
+		bytes[1] = (byte) ((integer >> 8) & 0xff);
+		bytes[2] = (byte) ((integer >> 16) & 0xff);
+		bytes[3] = (byte) ((integer >> 24) & 0xff);
+		return bytes;
+	}
+	
+	public int getID() {
+		return ID;
+	}
+
+	public int getPort() {
+		return port;
 	}
 	
 	public boolean isConnected() {
@@ -109,9 +118,5 @@ public class Connection extends Thread {
 	
 	public void setInitialized(boolean initialized) {
 		this.initialized = initialized;
-	}
-	
-	public int getPort() {
-		return port;
 	}
 }

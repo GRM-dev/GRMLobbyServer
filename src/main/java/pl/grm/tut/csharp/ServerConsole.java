@@ -3,25 +3,26 @@ package pl.grm.tut.csharp;
 import java.io.*;
 
 public class ServerConsole implements Runnable {
+	private ServerMain	serverMain;
+	private boolean		stop;
+	
+	public ServerConsole(ServerMain serverMain) {
+		this.serverMain = serverMain;
+	}
 	
 	@Override
 	public void run() {
 		String command = "";
 		do {
-			command = readCommand(command);
+			command = readCommand();
 			executeCommand(command);
 		}
-		while (!command.contains("!stop"));
-		System.out.println("Stopping server");
-		System.out.println("Connection amount " + ServerMain.connectionThreads.size());
-		ServerMain.executor.shutdownNow();
-		ServerMain.stopRequsted = true;
-		for (Connection connection : ServerMain.connectionThreads) {
-			connection.closeConnection();
-		}
+		while (!stop);
+		serverMain.stopServer();
 	}
 	
-	public String readCommand(String command) {
+	public String readCommand() {
+		String command = "";
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		try {
 			command = br.readLine();
@@ -32,10 +33,17 @@ public class ServerConsole implements Runnable {
 		return command;
 	}
 	
-	private void executeCommand(String command) {
+	private void executeCommand(String cName) {
+		Commands command = Commands.getCommand(cName);
 		switch (command) {
-			case "!connections" :
-				System.out.println(ServerMain.connectionThreads.size());
+			case STOP :
+				stop = true;
+				break;
+			case CONNECTIONS :
+				System.out.println(serverMain.getConnectionsAmount());
+				break;
+			case SEND_ALL :
+				serverMain.getConnection(serverMain.getConnectionsAmount() - 1);
 				break;
 			default :
 				System.out.println("Bad command");
