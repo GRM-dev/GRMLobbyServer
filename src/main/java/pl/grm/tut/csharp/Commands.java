@@ -30,7 +30,10 @@ public enum Commands {
 	
 	public static Commands getCommand(String name) {
 		for (Commands commT : Commands.values()) {
-			if (commT.getCommandString().equalsIgnoreCase(name)) { return commT; }
+			if (commT == NONE) {
+				continue;
+			}
+			if (name.toLowerCase().contains(commT.getCommandString())) { return commT; }
 		}
 		return NONE;
 	}

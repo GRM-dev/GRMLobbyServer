@@ -12,12 +12,16 @@ public class ServerMain {
 	private ExecutorService			executor;
 	private Thread					serverConsoleThread;
 	private Thread					connectorThread;
+	private CommandManager			commandManager;
 	private static ServerMain		instance;
+	
+	public ServerMain() {
+		commandManager = new CommandManager(this);
+	}
 	
 	public static void main(String[] args) {
 		ServerMain.instance = new ServerMain();
 		instance.startServer();
-		
 	}
 	
 	private void startServer() {
@@ -41,6 +45,7 @@ public class ServerMain {
 		for (Connection connection : connectionThreads) {
 			connection.closeConnection();
 		}
+		System.exit(0);
 	}
 	
 	public void addNewConnectionThread(Connection connection) {
@@ -49,8 +54,15 @@ public class ServerMain {
 	}
 	
 	public Connection getConnection(int id) {
-		Connection connection = connectionThreads.get(id);
-		return connection;
+		if (id < connectionThreads.size()) {
+			Connection connection = connectionThreads.get(id);
+			return connection;
+		}
+		return null;
+	}
+	
+	public void executeCommand(String command) {
+		commandManager.executeCommand(command);
 	}
 	
 	public boolean isStopRequsted() {

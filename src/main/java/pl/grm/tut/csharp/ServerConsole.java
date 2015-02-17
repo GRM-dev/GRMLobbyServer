@@ -15,7 +15,7 @@ public class ServerConsole implements Runnable {
 		String command = "";
 		do {
 			command = readCommand();
-			executeCommand(command);
+			serverMain.executeCommand(command);
 		}
 		while (!stop);
 		serverMain.stopServer();
@@ -31,23 +31,5 @@ public class ServerConsole implements Runnable {
 			e.printStackTrace();
 		}
 		return command;
-	}
-	
-	private void executeCommand(String cName) {
-		Commands command = Commands.getCommand(cName);
-		switch (command) {
-			case STOP :
-				stop = true;
-				break;
-			case CONNECTIONS :
-				System.out.println(serverMain.getConnectionsAmount());
-				break;
-			case SEND_ALL :
-				serverMain.getConnection(serverMain.getConnectionsAmount() - 1);
-				break;
-			default :
-				System.out.println("Bad command");
-				break;
-		}
 	}
 }
