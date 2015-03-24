@@ -1,4 +1,4 @@
-package pl.grm.tut.csharp;
+package pl.grm.sconn;
 
 import java.io.*;
 
@@ -12,6 +12,7 @@ public class ServerConsole implements Runnable {
 	
 	@Override
 	public void run() {
+		Thread.currentThread().setName("Server Console");
 		String command = "";
 		do {
 			command = readCommand();

@@ -1,7 +1,9 @@
-package pl.grm.tut.csharp;
+package pl.grm.sconn.connection;
 
 import java.io.*;
 import java.net.*;
+
+import pl.grm.sconn.*;
 
 public class Connection extends Thread {
 	private int				ID;
@@ -16,6 +18,7 @@ public class Connection extends Thread {
 		this.ID = id;
 		this.socket = socket;
 		this.port = socket.getPort();
+		this.setName("Connection " + id + " on port " + port);
 	}
 	
 	@Override
@@ -29,13 +32,13 @@ public class Connection extends Thread {
 	public void configureConnection() {
 		try {
 			setConnected(true);
-			System.out.println("Connected on port " + port);
+			CLogger.info("Connected on port " + port);
 			is = socket.getInputStream();
 			os = socket.getOutputStream();
 			String received = receivePacket();
 			while (!received.contains("!close")) {
 				try {
-					System.out.println("Server received message: " + received);
+					CLogger.info("Server received message: " + received);
 					sendPacket(received);
 					received = receivePacket();
 				}
@@ -52,7 +55,7 @@ public class Connection extends Thread {
 		finally {
 			closeConnection();
 			setConnected(false);
-			System.out.println("Disconnected");
+			CLogger.info("Disconnected");
 		}
 	}
 	
@@ -62,7 +65,7 @@ public class Connection extends Thread {
 		byte[] msgLenBytes = convertIntToBytes(msgLen);
 		os.write(msgLenBytes);
 		os.write(msgBytes);
-		System.out.println("Sended: " + msg);
+		CLogger.info("Sended: " + msg);
 	}
 	
 	public String receivePacket() throws IOException {
@@ -86,7 +89,7 @@ public class Connection extends Thread {
 			e.printStackTrace();
 		}
 	}
-
+	
 	public byte[] convertIntToBytes(int integer) {
 		byte[] bytes = new byte[4];
 		bytes[0] = (byte) (integer & 0xff);
@@ -99,7 +102,7 @@ public class Connection extends Thread {
 	public int getID() {
 		return ID;
 	}
-
+	
 	public int getPort() {
 		return port;
 	}

@@ -1,4 +1,4 @@
-package pl.grm.tut.csharp;
+package pl.grm.sconn.commands;
 
 public enum Commands {
 	NONE(

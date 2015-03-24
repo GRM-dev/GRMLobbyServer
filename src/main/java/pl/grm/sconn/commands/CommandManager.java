@@ -1,6 +1,9 @@
-package pl.grm.tut.csharp;
+package pl.grm.sconn.commands;
 
 import java.io.*;
+
+import pl.grm.sconn.*;
+import pl.grm.sconn.connection.*;
 
 public class CommandManager {
 	private ServerMain	serverMain;

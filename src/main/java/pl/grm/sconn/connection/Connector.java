@@ -1,10 +1,12 @@
-package pl.grm.tut.csharp;
+package pl.grm.sconn.connection;
 
 import java.io.*;
 import java.net.*;
 import java.util.*;
 
-public class Connector implements Runnable {
+import pl.grm.sconn.*;
+
+public class Connector extends Observable implements Runnable {
 	private ServerMain				serverMain;
 	private int						currentPort		= 0;
 	private int						connectionsOnCurrentPort;
@@ -18,31 +20,39 @@ public class Connector implements Runnable {
 	
 	@Override
 	public void run() {
-		int port = 0;
+		Thread.currentThread().setName("Connector");
 		while (!serverMain.isStopRequsted()) {
-			ServerSocket serverSocket;
-			try {
-				if (serverSockets.size() != 0 && isCurrentPortAvailable()) {
-					port = currentPort;
-				} else {
-					port = getAvailableNextPort();
-					serverSocket = new ServerSocket(port, 10);
-					serverSockets.add(serverSocket);
-				}
-				waitForNewConnection(port);
+			establishConnection();
+		}
+	}
+	
+	public void establishConnection() {
+		int port;
+		ServerSocket serverSocket;
+		try {
+			if (serverSockets.size() != 0 && isCurrentPortAvailable()) {
+				port = currentPort;
+			} else {
+				port = getAvailableNextPort();
+				serverSocket = new ServerSocket(port, 10);
+				serverSockets.add(serverSocket);
 			}
-			catch (IOException e) {
-				e.printStackTrace();
-			}
+			waitForNewConnection(port);
+		}
+		catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 	
 	public void waitForNewConnection(int port) throws IOException {
-		System.out.println("Server listening on port " + port + " now");
+		CLogger.info("Server listening on port " + port + " now");
 		socket = serverSockets.get(serverSockets.size() - 1).accept();
-		System.out.println("New connection established. " + socket.getInetAddress());
+		CLogger.info("New connection established. " + socket.getInetAddress());
+		notifyObservers();
 		Connection connection = new Connection(nextID, socket);
 		serverMain.addNewConnectionThread(connection);
+		connection.start();
+		notifyObservers();
 	}
 	
 	public boolean isCurrentPortAvailable() {
