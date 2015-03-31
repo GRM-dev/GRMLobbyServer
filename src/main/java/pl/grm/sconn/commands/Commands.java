@@ -10,6 +10,9 @@ public enum Commands {
 	CLOSE(
 			"close",
 			CommandType.BOTH) ,
+	CLOSECONN(
+			"closeConn",
+			CommandType.BOTH) ,
 	CONNECTIONS(
 			"connections",
 			CommandType.SERVER) ,

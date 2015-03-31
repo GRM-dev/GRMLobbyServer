@@ -26,6 +26,11 @@ public class CommandManager {
 				break;
 			case CLOSE :
 				serverMain.setStopRequsted(true);
+			case CLOSECONN :
+				serverMain.stopServer();
+				System.exit(0);
+				break;
+			case LIST :
 			default :
 				System.out.println("Bad command");
 				break;

@@ -38,8 +38,10 @@ public class Connection extends Thread {
 			String received = receivePacket();
 			while (!received.contains("!close")) {
 				try {
-					CLogger.info("Server received message: " + received);
-					sendPacket(received);
+					if (received != null & received != "") {
+						CLogger.info("Server received message: " + received);
+						sendPacket(received);
+					}
 					received = receivePacket();
 				}
 				catch (IOException ex) {

@@ -48,12 +48,30 @@ public class ServerGUI extends JFrame implements Observer {
 		menuBar.add(mnFile);
 		
 		JMenuItem mntmClose = new JMenuItem("Close");
+		mntmClose.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				dispose();
+			}
+		});
 		mnFile.add(mntmClose);
 		
 		JMenuItem mntmStartServer = new JMenuItem("Start Server");
+		mntmStartServer.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				serverMain.startServer();
+			}
+		});
 		mnFile.add(mntmStartServer);
 		
 		JMenuItem mntmStopServer = new JMenuItem("Stop Server");
+		mntmStopServer.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				serverMain.stopServer();
+			}
+		});
 		mnFile.add(mntmStopServer);
 		
 		JMenu mnTools = new JMenu("Tools");
@@ -124,6 +142,7 @@ public class ServerGUI extends JFrame implements Observer {
 			@Override
 			public void windowClosed(WindowEvent e) {
 				serverMain.stopServer();
+				System.exit(0);
 			}
 			
 			@Override

@@ -28,31 +28,45 @@ public class ServerMain {
 	}
 	
 	public static void main(String[] args) {
+		Thread.currentThread().setName("Main");
 		ServerMain.instance = new ServerMain();
+		instance.prepareServer();
 		if (args.length != 0 && args[0].equals("gui")) {
 			instance.setGuiActive(true);
+			instance.startGUI();
+		} else {
+			instance.startServer();
 		}
-		instance.startServer();
 	}
 	
-	private void startServer() {
-		Thread.currentThread().setName("Main");
+	private void prepareServer() {
 		CLogger.initLogger();
-		setupBaseServerThreads();
-		serverConsoleThread.start();
-		connectorThread.start();
-		if (isGuiActive()) {
-			startGUI();
-		}
-	}
-	
-	public void setupBaseServerThreads() {
-		CLogger.info("Starting server");
 		executor = Executors.newFixedThreadPool(CONNECTIONS_MAX_POOL);
 		connectionThreadsList = new ArrayList<Connection>();
 		serverConsoleThread = new Thread(new ServerConsole(this));
 		connector = new Connector(this);
+		
+		serverConsoleThread.start();
+	}
+	
+	public void startServer() {
+		CLogger.info("Starting server");
 		connectorThread = new Thread(connector);
+		connectorThread.start();
+	}
+	
+	public void stopServer() {
+		CLogger.info("Stopping server ...\nConnection amount on stop "
+				+ connectionThreadsList.size());
+		executor.shutdownNow();
+		setStopRequsted(true);
+		for (Connection connection : connectionThreadsList) {
+			connection.closeConnection();
+		}
+		connectionThreadsList.clear();
+		connectorThread.interrupt();
+		connectorThread = null;
+		executor = null;
 	}
 	
 	private void startGUI() {
@@ -69,17 +83,6 @@ public class ServerMain {
 				}
 			}
 		});
-	}
-	
-	public void stopServer() {
-		CLogger.info("Stopping server ...\nConnection amount on stop "
-				+ connectionThreadsList.size());
-		executor.shutdownNow();
-		setStopRequsted(true);
-		for (Connection connection : connectionThreadsList) {
-			connection.closeConnection();
-		}
-		System.exit(0);
 	}
 	
 	public void addNewConnectionThread(Connection connection) {
