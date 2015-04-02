@@ -51,22 +51,27 @@ public class ServerMain {
 	
 	public void startServer() {
 		CLogger.info("Starting server");
-		connectorThread = new Thread(connector);
-		connectorThread.start();
+		if (isStopRequsted()) {
+			setStopRequsted(false);
+			connectorThread = new Thread(connector);
+			connectorThread.start();
+		}
 	}
 	
 	public void stopServer() {
-		CLogger.info("Stopping server ...\nConnection amount on stop "
-				+ connectionThreadsList.size());
-		executor.shutdownNow();
-		setStopRequsted(true);
-		for (Connection connection : connectionThreadsList) {
-			connection.closeConnection();
+		if (isStopRequsted()) {
+			CLogger.info("Stopping server ...\nConnection amount on stop "
+					+ connectionThreadsList.size());
+			executor.shutdownNow();
+			setStopRequsted(true);
+			for (Connection connection : connectionThreadsList) {
+				connection.closeConnection();
+			}
+			connectionThreadsList.clear();
+			connectorThread.interrupt();
+			connectorThread = null;
+			executor = null;
 		}
-		connectionThreadsList.clear();
-		connectorThread.interrupt();
-		connectorThread = null;
-		executor = null;
 	}
 	
 	private void startGUI() {
