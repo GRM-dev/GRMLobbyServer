@@ -14,13 +14,12 @@ public class ServerMain {
 	public static int				MAX_PORT				= 4350;
 	public static int				CONNECTIONS_MAX_POOL	= 5;
 	private ArrayList<Connection>	connectionThreadsList;
-	private boolean					stopRequsted			= false;
+	private boolean					running					= false;
 	private ExecutorService			executor;
 	private Thread					serverConsoleThread;
 	private Thread					connectorThread;
 	private CommandManager			commandManager;
 	private static ServerMain		instance;
-	private boolean					guiActive;
 	private Connector				connector;
 	
 	public ServerMain() {
@@ -32,7 +31,6 @@ public class ServerMain {
 		ServerMain.instance = new ServerMain();
 		instance.prepareServer();
 		if (args.length != 0 && args[0].equals("gui")) {
-			instance.setGuiActive(true);
 			instance.startGUI();
 		} else {
 			instance.startServer();
@@ -41,29 +39,27 @@ public class ServerMain {
 	
 	private void prepareServer() {
 		CLogger.initLogger();
-		executor = Executors.newFixedThreadPool(CONNECTIONS_MAX_POOL);
 		connectionThreadsList = new ArrayList<Connection>();
 		serverConsoleThread = new Thread(new ServerConsole(this));
 		connector = new Connector(this);
-		
 		serverConsoleThread.start();
 	}
 	
 	public void startServer() {
-		CLogger.info("Starting server");
-		if (isStopRequsted()) {
-			setStopRequsted(false);
+		if (!isRunning()) {
+			CLogger.info("Starting server");
+			executor = Executors.newFixedThreadPool(CONNECTIONS_MAX_POOL);
 			connectorThread = new Thread(connector);
 			connectorThread.start();
+			setRunning(true);
 		}
 	}
 	
 	public void stopServer() {
-		if (isStopRequsted()) {
+		if (isRunning()) {
 			CLogger.info("Stopping server ...\nConnection amount on stop "
 					+ connectionThreadsList.size());
 			executor.shutdownNow();
-			setStopRequsted(true);
 			for (Connection connection : connectionThreadsList) {
 				connection.closeConnection();
 			}
@@ -71,6 +67,7 @@ public class ServerMain {
 			connectorThread.interrupt();
 			connectorThread = null;
 			executor = null;
+			setRunning(false);
 		}
 	}
 	
@@ -106,23 +103,15 @@ public class ServerMain {
 		commandManager.executeCommand(command);
 	}
 	
-	public boolean isStopRequsted() {
-		return stopRequsted;
+	public boolean isRunning() {
+		return running;
 	}
 	
-	public void setStopRequsted(boolean stopRequsted) {
-		this.stopRequsted = stopRequsted;
+	public void setRunning(boolean running) {
+		this.running = running;
 	}
 	
 	public int getConnectionsAmount() {
 		return connectionThreadsList.size();
-	}
-	
-	public boolean isGuiActive() {
-		return guiActive;
-	}
-	
-	public void setGuiActive(boolean guiActive) {
-		this.guiActive = guiActive;
 	}
 }

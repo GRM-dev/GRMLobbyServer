@@ -21,23 +21,20 @@ public class Connector extends Observable implements Runnable {
 	@Override
 	public void run() {
 		Thread.currentThread().setName("Connector");
-		while (!serverMain.isStopRequsted()) {
+		while (serverMain.isRunning()) {
 			establishConnection();
 		}
 	}
 	
 	public void establishConnection() {
-		int port;
 		ServerSocket serverSocket;
 		try {
-			if (serverSockets.size() != 0 && isCurrentPortAvailable()) {
-				port = currentPort;
-			} else {
-				port = getAvailableNextPort();
-				serverSocket = new ServerSocket(port, 10);
+			if (serverSockets.size() == 0 || !isCurrentPortAvailable()) {
+				currentPort = getAvailableNextPort();
+				serverSocket = new ServerSocket(currentPort, 10);
 				serverSockets.add(serverSocket);
 			}
-			waitForNewConnection(port);
+			waitForNewConnection(currentPort);
 		}
 		catch (IOException e) {
 			e.printStackTrace();
