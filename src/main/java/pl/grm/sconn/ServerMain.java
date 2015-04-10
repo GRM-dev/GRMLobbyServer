@@ -107,7 +107,7 @@ public class ServerMain {
 		return running;
 	}
 	
-	public void setRunning(boolean running) {
+	private void setRunning(boolean running) {
 		this.running = running;
 	}
 	

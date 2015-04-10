@@ -25,7 +25,7 @@ public class CommandManager {
 				sendAll(cName);
 				break;
 			case CLOSE :
-				serverMain.setRunning(true);
+				serverMain.stopServer();
 			case CLOSECONN :
 				serverMain.stopServer();
 				System.exit(0);
