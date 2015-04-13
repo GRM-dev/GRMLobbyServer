@@ -12,7 +12,7 @@ public class CommandManager {
 		this.serverMain = serverMain;
 	}
 	
-	public void executeCommand(String cName) {
+	public boolean executeCommand(String cName) {
 		Commands command = Commands.getCommand(cName);
 		switch (command) {
 			case STOP :
@@ -26,15 +26,23 @@ public class CommandManager {
 				break;
 			case CLOSE :
 				serverMain.stopServer();
-			case CLOSECONN :
-				serverMain.stopServer();
 				System.exit(0);
 				break;
+			case CLOSECONN :
+				serverMain.getConnection(0);
+				break;
 			case LIST :
+				break;
+			case START :
+				serverMain.startServer();
+				break;
+			case NONE :
+				
 			default :
 				System.out.println("Bad command");
-				break;
+				return false;
 		}
+		return true;
 	}
 	
 	private void sendAll(String msg) {

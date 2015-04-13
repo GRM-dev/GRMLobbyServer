@@ -45,10 +45,10 @@ public class Connector extends Observable implements Runnable {
 		CLogger.info("Server listening on port " + port + " now");
 		socket = serverSockets.get(serverSockets.size() - 1).accept();
 		CLogger.info("New connection established. " + socket.getInetAddress());
-		notifyObservers();
 		Connection connection = new Connection(nextID, socket);
 		serverMain.addNewConnectionThread(connection);
 		connection.start();
+		setChanged();
 		notifyObservers();
 	}
 	
@@ -59,12 +59,12 @@ public class Connector extends Observable implements Runnable {
 	
 	public int getAvailableNextPort() {
 		for (int port = ServerMain.START_PORT; port < ServerMain.MAX_PORT; port++) {
-			if (available(port)) { return port; }
+			if (isAvailable(port)) { return port; }
 		}
 		return 0;
 	}
 	
-	public boolean available(int port) {
+	public boolean isAvailable(int port) {
 		ServerSocket ss = null;
 		DatagramSocket ds = null;
 		try {

@@ -6,6 +6,7 @@ import java.util.*;
 
 import javax.swing.*;
 import javax.swing.border.*;
+import javax.swing.text.*;
 
 import pl.grm.sconn.*;
 import pl.grm.sconn.connection.*;
@@ -18,7 +19,7 @@ public class ServerGUI extends JFrame implements Observer {
 	private JTabbedPane			tabP;
 	private JLabel				lblConnAmountA;
 	private JTextArea			console;
-	private JTextField			consoleTextField;
+	private JTextField			consoleInput;
 	private ServerMain			serverMain;
 	
 	/**
@@ -88,6 +89,7 @@ public class ServerGUI extends JFrame implements Observer {
 		menuBar.add(canvas);
 		
 		lblStatusA = new JLabel("Off");
+		lblStatusA.setForeground(Color.RED);
 		menuBar.add(lblStatusA);
 		
 		JPanel botP = new JPanel();
@@ -117,11 +119,36 @@ public class ServerGUI extends JFrame implements Observer {
 		splitPane.add(consoleP, JSplitPane.BOTTOM);
 		
 		console = new JTextArea();
-		consoleP.add(console, BorderLayout.CENTER);
+		DefaultCaret caret = (DefaultCaret) console.getCaret();
+		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 		
-		consoleTextField = new JTextField();
-		consoleTextField.setColumns(10);
-		consoleP.add(consoleTextField, BorderLayout.SOUTH);
+		JScrollPane scrollPane = new JScrollPane(console);
+		consoleP.add(scrollPane, BorderLayout.CENTER);
+		
+		consoleInput = new JTextField();
+		consoleInput.setColumns(10);
+		consoleInput.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String input = consoleInput.getText();
+				if (input == null || input == "") { return; }
+				consoleInput.setText("");
+				boolean executed = serverMain.executeCommand(input);
+			}
+		});
+		consoleInput.addKeyListener(new KeyListener() {
+			@Override
+			public void keyTyped(KeyEvent e) {}
+			
+			@Override
+			public void keyReleased(KeyEvent e) {}
+			
+			@Override
+			public void keyPressed(KeyEvent e) {
+				
+			}
+		});
+		consoleP.add(consoleInput, BorderLayout.SOUTH);
 		
 		addWindowListener(new WindowListener() {
 			@Override
@@ -153,9 +180,17 @@ public class ServerGUI extends JFrame implements Observer {
 	
 	@Override
 	public void update(Observable o, Object arg) {
-		CLogger.info("Update");
 		if (o instanceof Connector) {
-			CLogger.info("Update");
+			CLogger.info("N Conn Upd");
+		}
+		if (o instanceof ServerMain) {
+			if (serverMain.isRunning()) {
+				lblStatusA.setText("On");
+				lblStatusA.setForeground(Color.GREEN);
+			} else {
+				lblStatusA.setText("Off");
+				lblStatusA.setForeground(Color.RED);
+			}
 		}
 	}
 }

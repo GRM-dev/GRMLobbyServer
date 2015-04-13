@@ -8,7 +8,7 @@ import pl.grm.sconn.commands.*;
 import pl.grm.sconn.connection.*;
 import pl.grm.sconn.gui.*;
 
-public class ServerMain {
+public class ServerMain extends Observable {
 	public static int				EST_PORT				= 4342;
 	public static int				START_PORT				= 4343;
 	public static int				MAX_PORT				= 4350;
@@ -23,6 +23,7 @@ public class ServerMain {
 	private Connector				connector;
 	
 	public ServerMain() {
+		CLogger.initLogger();
 		commandManager = new CommandManager(this);
 	}
 	
@@ -38,10 +39,9 @@ public class ServerMain {
 	}
 	
 	private void prepareServer() {
-		CLogger.initLogger();
 		connectionThreadsList = new ArrayList<Connection>();
-		serverConsoleThread = new Thread(new ServerConsole(this));
 		connector = new Connector(this);
+		serverConsoleThread = new Thread(new ServerConsole(this));
 		serverConsoleThread.start();
 	}
 	
@@ -52,6 +52,8 @@ public class ServerMain {
 			connectorThread = new Thread(connector);
 			connectorThread.start();
 			setRunning(true);
+			setChanged();
+			notifyObservers();
 		}
 	}
 	
@@ -68,6 +70,8 @@ public class ServerMain {
 			connectorThread = null;
 			executor = null;
 			setRunning(false);
+			setChanged();
+			notifyObservers();
 		}
 	}
 	
@@ -78,6 +82,7 @@ public class ServerMain {
 				try {
 					ServerGUI sGUI = new ServerGUI(ServerMain.this);
 					connector.addObserver(sGUI);
+					addObserver(sGUI);
 					sGUI.setVisible(true);
 				}
 				catch (Exception e) {
@@ -99,8 +104,8 @@ public class ServerMain {
 		return null;
 	}
 	
-	public void executeCommand(String command) {
-		commandManager.executeCommand(command);
+	public boolean executeCommand(String command) {
+		return commandManager.executeCommand(command);
 	}
 	
 	public boolean isRunning() {

@@ -21,7 +21,10 @@ public enum Commands {
 			CommandType.SERVER) ,
 	STOP(
 			"stop",
-			CommandType.BOTH);
+			CommandType.SERVER) ,
+	START(
+			"start",
+			CommandType.SERVER);
 	
 	private String		command;
 	private CommandType	type;
