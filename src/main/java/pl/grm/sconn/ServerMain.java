@@ -83,6 +83,7 @@ public class ServerMain extends Observable {
 					ServerGUI sGUI = new ServerGUI(ServerMain.this);
 					connector.addObserver(sGUI);
 					addObserver(sGUI);
+					sGUI.setCommandManager(commandManager);
 					sGUI.setVisible(true);
 				}
 				catch (Exception e) {

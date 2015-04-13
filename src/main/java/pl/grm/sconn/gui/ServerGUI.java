@@ -9,6 +9,7 @@ import javax.swing.border.*;
 import javax.swing.text.*;
 
 import pl.grm.sconn.*;
+import pl.grm.sconn.commands.*;
 import pl.grm.sconn.connection.*;
 
 public class ServerGUI extends JFrame implements Observer {
@@ -21,6 +22,7 @@ public class ServerGUI extends JFrame implements Observer {
 	private JTextArea			console;
 	private JTextField			consoleInput;
 	private ServerMain			serverMain;
+	private CommandManager		commandManager;
 	
 	/**
 	 * Create the frame.
@@ -32,6 +34,7 @@ public class ServerGUI extends JFrame implements Observer {
 		setTitle("Server GUI");
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
+		
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -133,7 +136,8 @@ public class ServerGUI extends JFrame implements Observer {
 				String input = consoleInput.getText();
 				if (input == null || input == "") { return; }
 				consoleInput.setText("");
-				boolean executed = serverMain.executeCommand(input);
+				serverMain.executeCommand(input);
+				commandManager.addCommandToList(input);
 			}
 		});
 		consoleInput.addKeyListener(new KeyListener() {
@@ -145,14 +149,32 @@ public class ServerGUI extends JFrame implements Observer {
 			
 			@Override
 			public void keyPressed(KeyEvent e) {
-				
+				if (e.getKeyCode() == KeyEvent.VK_UP) {
+					String input = consoleInput.getText();
+					if (input == null || input == "" || !commandManager.wasExecuted(input)) {
+						consoleInput.setText(commandManager.getLastCommand());
+					} else {
+						String previousCommand = commandManager.getPreviousCommand(input);
+						if (previousCommand != "") {
+							consoleInput.setText(previousCommand);
+						}
+					}
+				} else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+					String input = consoleInput.getText();
+					String nextCommand = commandManager.getNextCommand(input);
+					if (nextCommand != "" || input.equals(commandManager.getLastCommand())) {
+						consoleInput.setText(nextCommand);
+					}
+				}
 			}
 		});
 		consoleP.add(consoleInput, BorderLayout.SOUTH);
 		
 		addWindowListener(new WindowListener() {
 			@Override
-			public void windowOpened(WindowEvent e) {}
+			public void windowOpened(WindowEvent e) {
+				consoleInput.requestFocus();
+			}
 			
 			@Override
 			public void windowIconified(WindowEvent e) {}
@@ -192,5 +214,9 @@ public class ServerGUI extends JFrame implements Observer {
 				lblStatusA.setForeground(Color.RED);
 			}
 		}
+	}
+	
+	public void setCommandManager(CommandManager commandManager) {
+		this.commandManager = commandManager;
 	}
 }

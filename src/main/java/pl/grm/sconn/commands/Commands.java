@@ -34,14 +34,20 @@ public enum Commands {
 		this.type = type;
 	}
 	
-	public static Commands getCommand(String name) {
+	public static Commands getCommand(String commS) {
 		for (Commands commT : Commands.values()) {
 			if (commT == NONE) {
 				continue;
 			}
-			if (name.toLowerCase().contains(commT.getCommandString())) { return commT; }
+			if (commS.toLowerCase().startsWith(commT.getCommandString())) { return commT; }
 		}
 		return NONE;
+	}
+	
+	public static String getOffset(String commS) {
+		Commands comm = getCommand(commS);
+		if (comm == NONE) { return ""; }
+		return commS.replace(comm.getCommandString(), "");
 	}
 	
 	public String getCommandString() {
