@@ -39,7 +39,13 @@ public enum Commands {
 			if (commT == NONE) {
 				continue;
 			}
-			if (commS.toLowerCase().startsWith(commT.getCommandString())) { return commT; }
+			String cES = commT.getCommandString();
+			String cLS = commS.toLowerCase();
+			if (cLS.equals(cES)) { return commT; }
+			if (cLS.startsWith(cES) && cLS.contains(cES)) {
+				int iOfEndCmd = cES.length();
+				if (cLS.length() > iOfEndCmd && (cLS.charAt(iOfEndCmd) == ' ')) { return commT; }
+			}
 		}
 		return NONE;
 	}
