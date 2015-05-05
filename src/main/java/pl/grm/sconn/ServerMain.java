@@ -2,21 +2,24 @@ package pl.grm.sconn;
 
 import java.awt.EventQueue;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Observable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import pl.grm.sconn.commands.CommandManager;
-import pl.grm.sconn.commands.Commands;
+import pl.grm.sconn.connection.Connection;
 import pl.grm.sconn.connection.Connector;
 import pl.grm.sconn.gui.ServerGUI;
 
 public class ServerMain extends Observable {
-	public static int ESTABLISHER_PORT = 4342;
-	public static int ESTABLISHER_PORT_MAX_POOL = 120;
-	public static int START_PORT = 4343;
-	public static int SOCKETS_POOL = 5;
-	public static int CONNECTIONS_MAX_POOL_PER_SOCKET = 20;
+	public static int EST_PORT = 4342;
+	public static int CONNECTIONS_MAX_POOL = 50;
+	public static int START_CONNECTION_ID = 100;
+	private HashMap<Integer, Connection> connections;
 	private boolean running = false;
-
+	private ExecutorService executor;
 	private Thread serverConsoleThread;
 	private Thread connectorThread;
 	private CommandManager commandManager;
@@ -39,22 +42,22 @@ public class ServerMain extends Observable {
 				instance.startServer();
 			}
 		} catch (IOException e) {
-			CLogger.logException(e);
-			System.exit(1);
+			e.printStackTrace();
 		}
 	}
 
 	private void prepareServer() throws IOException {
+		connections = new HashMap<Integer, Connection>();
 		connector = new Connector(this);
-		serverConsoleThread = new Thread(new ServerConsole(this),
-				"Server Console");
+		serverConsoleThread = new Thread(new ServerConsole(this));
 		serverConsoleThread.start();
 	}
 
 	public void startServer() {
 		if (!isRunning()) {
 			CLogger.info("Starting server");
-			connectorThread = new Thread(connector, "Connector");
+			executor = Executors.newFixedThreadPool(CONNECTIONS_MAX_POOL);
+			connectorThread = new Thread(connector);
 			connectorThread.start();
 			setRunning(true);
 			setChanged();
@@ -62,16 +65,22 @@ public class ServerMain extends Observable {
 		}
 	}
 
-	public void stopServer(IOException e) {
-		if (e != null) {
-			e.printStackTrace();
-			CLogger.logException(e);
-		}
+	public void stopServer() {
 		if (isRunning()) {
-			setRunning(false);
+			CLogger.info("Stopping server ...\nConnection amount on stop "
+					+ getConnections().size());
+			executor.shutdownNow();
+			for (Iterator<Integer> it = getConnections().keySet()
+					.iterator(); it.hasNext();) {
+				int id = it.next();
+				Connection connection = getConnections().get(id);
+				connection.closeConnection();
+			}
+			getConnections().clear();
 			connectorThread.interrupt();
 			connectorThread = null;
-			connector.stopConnector();
+			executor = null;
+			setRunning(false);
 			setChanged();
 			notifyObservers();
 		}
@@ -94,12 +103,16 @@ public class ServerMain extends Observable {
 		});
 	}
 
-	public boolean executeCommand(Commands command) {
-		return commandManager.executeCommand(command, null);
+	public Connection getConnection(int id) {
+		if (id < getConnections().size()) {
+			Connection connection = getConnections().get(id);
+			return connection;
+		}
+		return null;
 	}
 
-	public boolean executeCommand(Commands command, String msg) {
-		return commandManager.executeCommand(command, msg);
+	public boolean executeCommand(String command) {
+		return commandManager.executeCommand(command);
 	}
 
 	public boolean isRunning() {
@@ -109,4 +122,13 @@ public class ServerMain extends Observable {
 	private void setRunning(boolean running) {
 		this.running = running;
 	}
+
+	public int getConnectionsAmount() {
+		return getConnections().size();
+	}
+
+	public HashMap<Integer, Connection> getConnections() {
+		return connections;
+	}
+
 }

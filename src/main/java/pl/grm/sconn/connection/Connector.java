@@ -1,8 +1,9 @@
 package pl.grm.sconn.connection;
 
 import java.io.IOException;
+import java.net.DatagramSocket;
+import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.Observable;
 
 import pl.grm.sconn.CLogger;
@@ -10,81 +11,73 @@ import pl.grm.sconn.ServerMain;
 
 public class Connector extends Observable implements Runnable {
 	private ServerMain serverMain;
-	private SocketManager sManager;
-	private static Connector instance;
-
-	private ArrayList<Connection> connectionThreadsList;
+	private int port;
+	private ServerSocket serverSocket;
 
 	public Connector(ServerMain serverMain) throws IOException {
 		this.serverMain = serverMain;
-		this.sManager = new SocketManager(serverMain);
-		this.connectionThreadsList = new ArrayList<Connection>();
-		instance = this;
+		port = ServerMain.EST_PORT;
+		if (isAvailable(port)) {
+			serverSocket = new ServerSocket(port);
+		} else {
+			throw new IOException("Port " + port + " not available!");
+		}
 	}
 
 	@Override
 	public void run() {
-		SocketManager.startMng(sManager);
+		Thread.currentThread().setName("Connector");
 		while (serverMain.isRunning()) {
 			try {
 				waitForNewConnection();
-				new Thread(createConnection()).start();
 			} catch (IOException e) {
-				serverMain.stopServer(e);
+				e.printStackTrace();
+				serverMain.stopServer();
 			}
 		}
 	}
 
-	private void waitForNewConnection() throws IOException {
-		int port = sManager.getAvailablePort();
+	public void waitForNewConnection() throws IOException {
 		CLogger.info("Server listening on port " + port + " now");
-		sSocket = sManager.getActiveSocket;
-		Socket socket = sSocket.accept();
+		Socket socket = serverSocket.accept();
 		CLogger.info("New connection established. " + socket.getInetAddress());
+		Connection connection = new Connection(nextID(), socket);
+		serverMain.getConnections().put(nextID(), connection);
+		connection.start();
 		setChanged();
 		notifyObservers();
 	}
 
-	private Connection createConnection() {
-		Connection connection = new Connection(++sManager.nextID,
-				sManager.socket);
-		serverMain.addNewConnectionThread(connection);
-		return connection;
+	public int nextID() {
+		for (int id = ServerMain.START_CONNECTION_ID; id < 100000; id++) {
+			if (!serverMain.getConnections().containsKey(id)) {
+				return id;
+			}
+		}
+		return 0;
 	}
 
-	public void stopConnector() {
-		sManager.getExecutor().shutdownNow();
-		CLogger.info("Stopping server ...\nConnection amount on stop "
-				+ connectionThreadsList.size());
-		for (Connection connection : connectionThreadsList) {
-			connection.closeConnection();
-		}
+	public static boolean isAvailable(int port) {
+		ServerSocket ss = null;
+		DatagramSocket ds = null;
 		try {
-			Thread.sleep(1000l);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+			ss = new ServerSocket(port);
+			ss.setReuseAddress(true);
+			ds = new DatagramSocket(port);
+			ds.setReuseAddress(true);
+			return true;
+		} catch (IOException e) {
+		} finally {
+			if (ds != null) {
+				ds.close();
+			}
+			if (ss != null) {
+				try {
+					ss.close();
+				} catch (IOException e) {
+				}
+			}
 		}
-		connectionThreadsList.clear();
-		sManager.setExecutor(null);
-	}
-
-	public void addNewConnectionThread(Connection connection) {
-		connectionThreadsList.add(connection);
-	}
-
-	public Connection getConnection(int id) {
-		if (id < connectionThreadsList.size()) {
-			Connection connection = connectionThreadsList.get(id);
-			return connection;
-		}
-		return null;
-	}
-
-	public static int getConnectionsAmount() {
-		return instance.connectionThreadsList.size();
-	}
-
-	public ArrayList<Connection> getConnectionThreadsList() {
-		return connectionThreadsList;
+		return false;
 	}
 }

@@ -34,12 +34,6 @@ public class ServerGUI extends JFrame implements Observer {
 		setTitle("Server GUI");
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
-		try {
-			UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
 		
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
