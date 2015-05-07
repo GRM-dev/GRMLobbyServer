@@ -38,7 +38,7 @@ public class Connector extends Observable implements Runnable {
 	}
 
 	public void waitForNewConnection() throws IOException {
-		CLogger.info("Server listening on port " + port + " now");
+		CLogger.info("Server listening on port " + port);
 		Socket socket = serverSocket.accept();
 		CLogger.info("New connection established. " + socket.getInetAddress());
 		Connection connection = new Connection(nextID(), socket);

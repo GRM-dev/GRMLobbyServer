@@ -1,127 +1,128 @@
 package pl.grm.sconn.connection;
 
-import java.io.*;
-import java.net.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.Socket;
 
-import pl.grm.sconn.*;
+import pl.grm.sconn.CLogger;
+import pl.grm.sconn.ServerMain;
+import pl.grm.sconn.data.User;
 
 public class Connection extends Thread {
-	private int				ID;
-	private int				port;
-	private InputStream		is;
-	private OutputStream	os;
-	private boolean			connected;
-	private boolean			initialized;
-	private Socket			socket;
-	
+	private int ID;
+	private int port;
+	private InputStream is;
+	private OutputStream os;
+	private boolean connected;
+	private boolean initialized;
+	private Socket socket;
+	private User user;
+
 	public Connection(int id, Socket socket) {
 		this.ID = id;
 		this.socket = socket;
 		this.port = socket.getPort();
 		this.setName("Connection " + id + " on port " + port);
 	}
-	
+
 	@Override
 	public void run() {
 		if (!isConnected() && !isInitialized()) {
-			setInitialized(true);
-			configureConnection();
+			try {
+				configureConnection();
+				setInitialized(true);
+				String received = "";
+				// received=PacketParser.receiveMessage(is);
+				user = PacketParser.receiveUserData(is, os);
+				System.out.println(user.getName());
+				while (!received.contains("!close")) {
+					if (received != null & received != "") {
+						CLogger.info("Server received message: " + received);
+						PacketParser.sendMessage(received, os);
+					}
+					received = PacketParser.receiveMessage(is);
+					if (received.length() > 0
+							&& ServerMain.instance.executeCommand(received)) {
+						PacketParser.sendMessage("Executed", os);
+					}
+				}
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			} finally {
+				closeConnection();
+				setConnected(false);
+				CLogger.info("Disconnected");
+			}
 		}
 	}
-	
-	public void configureConnection() {
+
+	public void configureConnection() throws IOException {
 		try {
 			setConnected(true);
 			CLogger.info("Connected on port " + port);
 			is = socket.getInputStream();
 			os = socket.getOutputStream();
-			String received = receivePacket();
-			while (!received.contains("!close")) {
-				try {
-					if (received != null & received != "") {
-						CLogger.info("Server received message: " + received);
-						sendPacket(received);
-					}
-					received = receivePacket();
-				}
-				catch (IOException ex) {
-					break;
-				}
-			}
-		}
-		catch (IOException e) {
+
+		} catch (IOException e) {
 			if (!e.getMessage().contains("socket closed")) {
 				e.printStackTrace();
 			}
-		}
-		finally {
-			closeConnection();
-			setConnected(false);
-			CLogger.info("Disconnected");
+			throw new IOException(e.getMessage());
 		}
 	}
-	
-	public void sendPacket(String msg) throws IOException {
-		byte[] msgBytes = msg.getBytes();
-		int msgLen = msgBytes.length;
-		byte[] msgLenBytes = convertIntToBytes(msgLen);
-		os.write(msgLenBytes);
-		os.write(msgBytes);
-		CLogger.info("Sended: " + msg);
-	}
-	
-	public String receivePacket() throws IOException {
-		byte[] lenBytes = new byte[4];
-		is.read(lenBytes, 0, 4);
-		int len = (((lenBytes[3] & 0xff) << 24) | ((lenBytes[2] & 0xff) << 16)
-				| ((lenBytes[1] & 0xff) << 8) | (lenBytes[0] & 0xff));
-		byte[] receivedBytes = new byte[len];
-		is.read(receivedBytes, 0, len);
-		String received = new String(receivedBytes, 0, len);
-		return received;
-	}
-	
+
 	public void closeConnection() {
 		try {
 			if (socket != null) {
 				socket.close();
 			}
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-	
-	public byte[] convertIntToBytes(int integer) {
-		byte[] bytes = new byte[4];
-		bytes[0] = (byte) (integer & 0xff);
-		bytes[1] = (byte) ((integer >> 8) & 0xff);
-		bytes[2] = (byte) ((integer >> 16) & 0xff);
-		bytes[3] = (byte) ((integer >> 24) & 0xff);
-		return bytes;
-	}
-	
+
 	public int getID() {
 		return ID;
 	}
-	
+
 	public int getPort() {
 		return port;
 	}
-	
+
+	public InputStream getIs() {
+		return is;
+	}
+
+	public OutputStream getOs() {
+		return os;
+	}
+
+	public Socket getSocket() {
+		return socket;
+	}
+
 	public boolean isConnected() {
 		return connected;
 	}
-	
+
 	public void setConnected(boolean connected) {
 		this.connected = connected;
 	}
-	
+
 	public boolean isInitialized() {
 		return initialized;
 	}
-	
+
 	public void setInitialized(boolean initialized) {
 		this.initialized = initialized;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
 	}
 }

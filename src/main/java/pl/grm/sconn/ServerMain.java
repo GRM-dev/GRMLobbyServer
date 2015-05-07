@@ -23,7 +23,7 @@ public class ServerMain extends Observable {
 	private Thread serverConsoleThread;
 	private Thread connectorThread;
 	private CommandManager commandManager;
-	private static ServerMain instance;
+	public static ServerMain instance;
 	private Connector connector;
 
 	public ServerMain() {
@@ -70,8 +70,8 @@ public class ServerMain extends Observable {
 			CLogger.info("Stopping server ...\nConnection amount on stop "
 					+ getConnections().size());
 			executor.shutdownNow();
-			for (Iterator<Integer> it = getConnections().keySet()
-					.iterator(); it.hasNext();) {
+			for (Iterator<Integer> it = getConnections().keySet().iterator(); it
+					.hasNext();) {
 				int id = it.next();
 				Connection connection = getConnections().get(id);
 				connection.closeConnection();
@@ -104,7 +104,7 @@ public class ServerMain extends Observable {
 	}
 
 	public Connection getConnection(int id) {
-		if (id < getConnections().size()) {
+		if (getConnections().containsKey(id)) {
 			Connection connection = getConnections().get(id);
 			return connection;
 		}
