@@ -42,7 +42,7 @@ public class Connector extends Observable implements Runnable {
 		Socket socket = serverSocket.accept();
 		CLogger.info("New connection established. " + socket.getInetAddress());
 		Connection connection = new Connection(nextID(), socket);
-		serverMain.getConnections().put(nextID(), connection);
+		serverMain.addConnection(nextID(), connection);
 		connection.start();
 		setChanged();
 		notifyObservers();

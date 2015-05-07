@@ -50,11 +50,11 @@ public class User {
 	@Override
 	public String toString() {
 		JSONObject obj = new JSONObject();
+		obj.put("ID", ID);
 		obj.put("name", name);
 		obj.put("age", age);
 		obj.put("mail", mail);
 		String objS = obj.toString();
-		System.out.println(objS);
 		return objS;
 	}
 }

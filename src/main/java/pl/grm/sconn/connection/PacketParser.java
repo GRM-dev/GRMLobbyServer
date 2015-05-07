@@ -3,6 +3,7 @@ package pl.grm.sconn.connection;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.Socket;
 
 import org.json.JSONObject;
 
@@ -11,20 +12,19 @@ import pl.grm.sconn.data.User;
 
 public class PacketParser {
 
-	public static void sendUserData(User user, OutputStream os)
+	public static void sendUserData(User user, Socket socket)
 			throws IOException {
 		JSONObject obj = new JSONObject();
 		obj.put(user.getID() + "", new JSONObject(user));
 		String objS = obj.toString();
-		sendMessage(objS, os);
+		sendMessage(objS, socket);
 	}
 
-	public static User receiveUserData(InputStream is, OutputStream os)
-			throws IOException {
-		sendMessage("!userdata", os);
+	public static User receiveUserData(Socket socket) throws IOException {
+		sendMessage("!userdata", socket);
 		String rec = "";
 		while (!rec.startsWith("{\"")) {
-			rec = receiveMessage(is);
+			rec = receiveMessage(socket);
 		}
 		try {
 			JSONObject obj = new JSONObject(rec);
@@ -44,17 +44,21 @@ public class PacketParser {
 		}
 	}
 
-	public static void sendMessage(String msg, OutputStream os)
+	public static void sendMessage(String msg, Socket socket)
 			throws IOException {
+		OutputStream os = socket.getOutputStream();
 		byte[] msgBytes = msg.getBytes();
 		int msgLen = msgBytes.length;
 		byte[] msgLenBytes = convertIntToBytes(msgLen);
-		os.write(msgLenBytes);
-		os.write(msgBytes);
-		CLogger.info("Sended: " + msg);
+		if (!socket.isClosed()) {
+			os.write(msgLenBytes);
+			os.write(msgBytes);
+			CLogger.info("Sended: " + msg);
+		}
 	}
 
-	public static String receiveMessage(InputStream is) throws IOException {
+	public static String receiveMessage(Socket socket) throws IOException {
+		InputStream is = socket.getInputStream();
 		byte[] lenBytes = new byte[4];
 		is.read(lenBytes, 0, 4);
 		int len = convertBytesToInt(lenBytes);

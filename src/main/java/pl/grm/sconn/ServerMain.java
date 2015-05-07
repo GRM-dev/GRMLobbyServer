@@ -25,6 +25,7 @@ public class ServerMain extends Observable {
 	private CommandManager commandManager;
 	public static ServerMain instance;
 	private Connector connector;
+	private ServerGUI sGUI;
 
 	public ServerMain() {
 		CLogger.initLogger();
@@ -91,7 +92,7 @@ public class ServerMain extends Observable {
 			@Override
 			public void run() {
 				try {
-					ServerGUI sGUI = new ServerGUI(ServerMain.this);
+					sGUI = new ServerGUI(ServerMain.this);
 					connector.addObserver(sGUI);
 					addObserver(sGUI);
 					sGUI.setCommandManager(commandManager);
@@ -113,6 +114,11 @@ public class ServerMain extends Observable {
 
 	public boolean executeCommand(String command) {
 		return commandManager.executeCommand(command);
+	}
+
+	public void addConnection(int nextID, Connection connection) {
+		connections.put(nextID, connection);
+		sGUI.addTab(connection.getTab());
 	}
 
 	public boolean isRunning() {

@@ -65,7 +65,7 @@ public class CommandManager {
 				int id = it.next();
 				Connection connection = serverMain.getConnection(id);
 				try {
-					PacketParser.sendMessage(msg, connection.getOs());
+					PacketParser.sendMessage(msg, connection.getSocket());
 				} catch (IOException e) {
 					e.printStackTrace();
 				}

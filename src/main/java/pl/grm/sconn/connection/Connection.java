@@ -8,6 +8,7 @@ import java.net.Socket;
 import pl.grm.sconn.CLogger;
 import pl.grm.sconn.ServerMain;
 import pl.grm.sconn.data.User;
+import pl.grm.sconn.gui.ConnectionTab;
 
 public class Connection extends Thread {
 	private int ID;
@@ -18,12 +19,15 @@ public class Connection extends Thread {
 	private boolean initialized;
 	private Socket socket;
 	private User user;
+	private ConnectionTab tab;
 
 	public Connection(int id, Socket socket) {
 		this.ID = id;
 		this.socket = socket;
 		this.port = socket.getPort();
-		this.setName("Connection " + id + " on port " + port);
+		this.setName("ID: " + id);
+		this.setTab(new ConnectionTab(this));
+		ServerMain.instance.notifyObservers();
 	}
 
 	@Override
@@ -33,18 +37,19 @@ public class Connection extends Thread {
 				configureConnection();
 				setInitialized(true);
 				String received = "";
-				// received=PacketParser.receiveMessage(is);
-				user = PacketParser.receiveUserData(is, os);
-				System.out.println(user.getName());
+				user = PacketParser.receiveUserData(socket);
+				CLogger.info("Welcome " + user.getName() + "!");
+				tab.fillUP();
 				while (!received.contains("!close")) {
 					if (received != null & received != "") {
 						CLogger.info("Server received message: " + received);
-						PacketParser.sendMessage(received, os);
+						PacketParser.sendMessage(received, socket);// TODO: stop
+																	// requested
 					}
-					received = PacketParser.receiveMessage(is);
+					received = PacketParser.receiveMessage(socket);
 					if (received.length() > 0
 							&& ServerMain.instance.executeCommand(received)) {
-						PacketParser.sendMessage("Executed", os);
+						PacketParser.sendMessage("Executed", socket);
 					}
 				}
 			} catch (IOException ex) {
@@ -124,5 +129,13 @@ public class Connection extends Thread {
 
 	public void setUser(User user) {
 		this.user = user;
+	}
+
+	public ConnectionTab getTab() {
+		return tab;
+	}
+
+	public void setTab(ConnectionTab tab) {
+		this.tab = tab;
 	}
 }
