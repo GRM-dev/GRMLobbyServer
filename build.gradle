@@ -30,7 +30,8 @@ repositories {
 
 dependencies {
     compile group: 'com.google.guava', name: 'guava', version: '18.0'
-    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.3.2'
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.4'
+    compile group: 'org.json', name: 'json', version: '20141113'
     testCompile 'junit:junit:4.12'
 }
 
