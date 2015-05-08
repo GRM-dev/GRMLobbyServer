@@ -17,6 +17,7 @@ public class ServerMain extends Observable {
 	public static int EST_PORT = 4342;
 	public static int CONNECTIONS_MAX_POOL = 50;
 	public static int START_CONNECTION_ID = 100;
+	public static String CONFIG_FILE_NAME = "config.ini";
 	private HashMap<Integer, Connection> connections;
 	private boolean running = false;
 	private ExecutorService executor;
