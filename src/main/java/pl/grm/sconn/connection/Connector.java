@@ -10,6 +10,7 @@ import pl.grm.sconn.CLogger;
 import pl.grm.sconn.ServerMain;
 
 public class Connector extends Observable implements Runnable {
+
 	private ServerMain serverMain;
 	private int port;
 	private ServerSocket serverSocket;
@@ -30,7 +31,8 @@ public class Connector extends Observable implements Runnable {
 		while (serverMain.isRunning()) {
 			try {
 				waitForNewConnection();
-			} catch (IOException e) {
+			}
+			catch (IOException e) {
 				e.printStackTrace();
 				serverMain.stopServer();
 			}
@@ -40,9 +42,11 @@ public class Connector extends Observable implements Runnable {
 	public void waitForNewConnection() throws IOException {
 		CLogger.info("Server listening on port " + port);
 		Socket socket = serverSocket.accept();
-		CLogger.info("New connection established. " + socket.getInetAddress());
-		Connection connection = new Connection(nextID(), socket);
-		serverMain.addConnection(nextID(), connection);
+		int nextID = nextID();
+		CLogger.info("New connection established: ID=" + nextID + " localPort="
+				+ socket.getInetAddress());
+		Connection connection = new Connection(nextID, socket);
+		serverMain.addConnection(nextID, connection);
 		connection.start();
 		setChanged();
 		notifyObservers();
@@ -50,9 +54,7 @@ public class Connector extends Observable implements Runnable {
 
 	public int nextID() {
 		for (int id = ServerMain.START_CONNECTION_ID; id < 100000; id++) {
-			if (!serverMain.getConnections().containsKey(id)) {
-				return id;
-			}
+			if (!serverMain.containsConnection(id)) { return id; }
 		}
 		return 0;
 	}
@@ -66,16 +68,17 @@ public class Connector extends Observable implements Runnable {
 			ds = new DatagramSocket(port);
 			ds.setReuseAddress(true);
 			return true;
-		} catch (IOException e) {
-		} finally {
+		}
+		catch (IOException e) {}
+		finally {
 			if (ds != null) {
 				ds.close();
 			}
 			if (ss != null) {
 				try {
 					ss.close();
-				} catch (IOException e) {
 				}
+				catch (IOException e) {}
 			}
 		}
 		return false;

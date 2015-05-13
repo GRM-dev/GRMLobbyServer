@@ -12,6 +12,12 @@ import pl.grm.sconn.data.User;
 
 public class PacketParser {
 
+	public static boolean parseJSON(String msg) {
+		return false;
+		// TODO Auto-generated method stub
+
+	}
+
 	public static void sendUserData(User user, Socket socket)
 			throws IOException {
 		JSONObject obj = new JSONObject();
@@ -32,12 +38,11 @@ public class PacketParser {
 			String name = obj.getString("Name");
 			int age = obj.getInt("Age");
 			String mail = obj.getString("Mail");
-			if (id == 0 || name == "" || age == 0 || mail == "") {
-				throw new Exception(
-						"Got bad response. One or more Values is null ");
-			}
+			if (id == 0 || name == "" || age == 0 || mail == "") { throw new Exception(
+					"Got bad response. One or more Values is null "); }
 			return new User(id, name, age, mail);
-		} catch (Exception ex) {
+		}
+		catch (Exception ex) {
 			ex.printStackTrace();
 			CLogger.logException(ex);
 			return null;
@@ -74,8 +79,8 @@ public class PacketParser {
 	}
 
 	private static byte[] convertIntToBytes(int number) {
-		return new byte[] { (byte) (number & 0xff),
+		return new byte[]{(byte) (number & 0xff),
 				(byte) ((number >> 8) & 0xff), (byte) ((number >> 16) & 0xff),
-				(byte) ((number >> 24) & 0xff) };
+				(byte) ((number >> 24) & 0xff)};
 	}
 }

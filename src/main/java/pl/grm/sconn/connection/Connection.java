@@ -7,10 +7,13 @@ import java.net.Socket;
 
 import pl.grm.sconn.CLogger;
 import pl.grm.sconn.ServerMain;
+import pl.grm.sconn.commands.CommandType;
+import pl.grm.sconn.commands.Commands;
 import pl.grm.sconn.data.User;
 import pl.grm.sconn.gui.ConnectionTab;
 
 public class Connection extends Thread {
+
 	private int ID;
 	private int port;
 	private InputStream is;
@@ -47,17 +50,26 @@ public class Connection extends Thread {
 																	// requested
 					}
 					received = PacketParser.receiveMessage(socket);
+					Commands cmm;
 					if (received.length() > 0
-							&& ServerMain.instance.executeCommand(received)) {
-						PacketParser.sendMessage("Executed", socket);
+							&& (cmm = ServerMain.instance.getCM().executeCommand(
+									received, CommandType.CLIENT)) != Commands.NONE) {
+						if (cmm == Commands.ERROR) {
+							CLogger.info("Command not executed");
+						} else {
+							CLogger.info("Command executed on connection " + ID);
+						}
 					}
 				}
-			} catch (IOException ex) {
+			}
+			catch (IOException ex) {
 				ex.printStackTrace();
-			} finally {
+			}
+			finally {
 				closeConnection();
 				setConnected(false);
-				CLogger.info("Disconnected");
+				CLogger.info("Connection " + ID + " | Disconnected");
+				ServerMain.instance.destroyConnection(ID);
 			}
 		}
 	}
@@ -69,7 +81,8 @@ public class Connection extends Thread {
 			is = socket.getInputStream();
 			os = socket.getOutputStream();
 
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			if (!e.getMessage().contains("socket closed")) {
 				e.printStackTrace();
 			}
@@ -82,7 +95,8 @@ public class Connection extends Thread {
 			if (socket != null) {
 				socket.close();
 			}
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			e.printStackTrace();
 		}
 	}

@@ -14,7 +14,7 @@ import pl.grm.sconn.ServerMain;
 public class Config extends HashMap<Property, String> {
 	private static final long serialVersionUID = 1L;
 	private static Config config;
-	private static String[] SECTION_NAME = { "database" };
+	private static String[] SECTION_NAME = {"database", "gui", "server"};
 
 	public static void loadConfig() {
 		String filename = ServerMain.CONFIG_FILE_NAME;

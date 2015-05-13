@@ -1,27 +1,32 @@
 package pl.grm.sconn;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+import pl.grm.sconn.commands.CommandType;
 
 public class ServerConsole implements Runnable {
-	private ServerMain	serverMain;
-	private boolean		stop;
-	
+
+	private ServerMain serverMain;
+	private boolean stop;
+
 	public ServerConsole(ServerMain serverMain) {
 		this.serverMain = serverMain;
 	}
-	
+
 	@Override
 	public void run() {
 		Thread.currentThread().setName("Server Console");
 		String command = "";
 		do {
 			command = readCommand();
-			serverMain.executeCommand(command);
+			serverMain.getCM().executeCommand(command, CommandType.SERVER);
 		}
 		while (!stop);
 		serverMain.stopServer();
 	}
-	
+
 	public String readCommand() {
 		String command = "";
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));

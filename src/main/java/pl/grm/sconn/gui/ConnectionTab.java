@@ -9,6 +9,7 @@ import javax.swing.JPanel;
 import pl.grm.sconn.connection.Connection;
 
 public class ConnectionTab extends JPanel {
+
 	private static final long serialVersionUID = 1L;
 	private Connection connection;
 	private JLabel labelID;

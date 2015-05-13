@@ -2,9 +2,11 @@ package pl.grm.sconn;
 
 import java.awt.EventQueue;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Observable;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -14,6 +16,7 @@ import pl.grm.sconn.connection.Connector;
 import pl.grm.sconn.gui.ServerGUI;
 
 public class ServerMain extends Observable {
+
 	public static int EST_PORT = 4342;
 	public static int CONNECTIONS_MAX_POOL = 50;
 	public static int START_CONNECTION_ID = 100;
@@ -43,7 +46,8 @@ public class ServerMain extends Observable {
 			} else {
 				instance.startServer();
 			}
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
@@ -72,13 +76,12 @@ public class ServerMain extends Observable {
 			CLogger.info("Stopping server ...\nConnection amount on stop "
 					+ getConnections().size());
 			executor.shutdownNow();
-			for (Iterator<Integer> it = getConnections().keySet().iterator(); it
-					.hasNext();) {
+			for (Iterator<Integer> it = getConnectionsIDs().iterator(); it.hasNext();) {
 				int id = it.next();
-				Connection connection = getConnections().get(id);
+				Connection connection = getConnection(id);
 				connection.closeConnection();
 			}
-			getConnections().clear();
+			connections.clear();
 			connectorThread.interrupt();
 			connectorThread = null;
 			executor = null;
@@ -90,6 +93,7 @@ public class ServerMain extends Observable {
 
 	private void startGUI() {
 		EventQueue.invokeLater(new Runnable() {
+
 			@Override
 			public void run() {
 				try {
@@ -98,28 +102,44 @@ public class ServerMain extends Observable {
 					addObserver(sGUI);
 					sGUI.setCommandManager(commandManager);
 					sGUI.setVisible(true);
-				} catch (Exception e) {
+				}
+				catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		});
 	}
 
+	public void addConnection(int nextID, Connection connection) {
+		connections.put(nextID, connection);
+		sGUI.addTab(connection.getTab());
+		setChanged();
+	}
+
+	public void destroyConnection(int id) {
+		Connection connection = getConnection(id);
+		if (connection != null) {
+			if (connection.isConnected()) {
+				connection.closeConnection();
+			}
+			sGUI.removeTab(connection.getTab());
+			connections.remove(id);
+			setChanged();
+		}
+		notifyObservers();
+	}
+
 	public Connection getConnection(int id) {
-		if (getConnections().containsKey(id)) {
-			Connection connection = getConnections().get(id);
+		if (containsConnection(id)) {
+			Connection connection = connections.get(id);
+			setChanged();
 			return connection;
 		}
 		return null;
 	}
 
-	public boolean executeCommand(String command) {
-		return commandManager.executeCommand(command);
-	}
-
-	public void addConnection(int nextID, Connection connection) {
-		connections.put(nextID, connection);
-		sGUI.addTab(connection.getTab());
+	public CommandManager getCM() {
+		return this.commandManager;
 	}
 
 	public boolean isRunning() {
@@ -128,14 +148,22 @@ public class ServerMain extends Observable {
 
 	private void setRunning(boolean running) {
 		this.running = running;
+		setChanged();
 	}
 
 	public int getConnectionsAmount() {
 		return getConnections().size();
 	}
 
-	public HashMap<Integer, Connection> getConnections() {
-		return connections;
+	public Collection<Connection> getConnections() {
+		return connections.values();
 	}
 
+	public Set<Integer> getConnectionsIDs() {
+		return connections.keySet();
+	}
+
+	public boolean containsConnection(int id) {
+		return connections.containsKey(id);
+	}
 }

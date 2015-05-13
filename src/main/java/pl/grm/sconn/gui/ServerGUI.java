@@ -1,7 +1,6 @@
 package pl.grm.sconn.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -23,10 +22,9 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.SwingConstants;
+import javax.swing.JToggleButton;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.DefaultCaret;
@@ -34,19 +32,21 @@ import javax.swing.text.DefaultCaret;
 import pl.grm.sconn.CLogger;
 import pl.grm.sconn.ServerMain;
 import pl.grm.sconn.commands.CommandManager;
+import pl.grm.sconn.commands.CommandType;
 import pl.grm.sconn.connection.Connector;
 
 public class ServerGUI extends JFrame implements Observer {
+
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JLabel lblStatusA;
-	private Canvas canvas;
-	private JTabbedPane tabP;
+	private ClosableTabbedPane tabP;
 	private JLabel lblConnAmountA;
 	private JTextArea console;
 	private JTextField consoleInput;
 	private ServerMain serverMain;
 	private CommandManager commandManager;
+	private JToggleButton tglbtnStartStop;
 
 	/**
 	 * Create the frame.
@@ -57,7 +57,7 @@ public class ServerGUI extends JFrame implements Observer {
 		this.serverMain = serverMain;
 		setTitle("Server GUI");
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 450, 300);
+		setBounds(100, 100, 800, 600);
 
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -77,6 +77,7 @@ public class ServerGUI extends JFrame implements Observer {
 
 		JMenuItem mntmClose = new JMenuItem("Close");
 		mntmClose.addActionListener(new ActionListener() {
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				dispose();
@@ -86,6 +87,7 @@ public class ServerGUI extends JFrame implements Observer {
 
 		JMenuItem mntmStartServer = new JMenuItem("Start Server");
 		mntmStartServer.addActionListener(new ActionListener() {
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				serverMain.startServer();
@@ -95,6 +97,7 @@ public class ServerGUI extends JFrame implements Observer {
 
 		JMenuItem mntmStopServer = new JMenuItem("Stop Server");
 		mntmStopServer.addActionListener(new ActionListener() {
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				serverMain.stopServer();
@@ -107,13 +110,23 @@ public class ServerGUI extends JFrame implements Observer {
 
 		JMenuItem mntmSettings = new JMenuItem("Settings ...");
 		mnTools.add(mntmSettings);
+		tglbtnStartStop = new JToggleButton("Start/Stop");
+		tglbtnStartStop.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (tglbtnStartStop.isSelected()) {
+					serverMain.startServer();
+				} else {
+					serverMain.stopServer();
+				}
+			}
+		});
+		menuBar.add(tglbtnStartStop);
 
 		JLabel lblStatus = new JLabel("Status: ");
 		lblStatus.setFont(new Font("Tahoma", Font.BOLD, 11));
 		menuBar.add(lblStatus);
-
-		canvas = new Canvas();
-		menuBar.add(canvas);
 
 		lblStatusA = new JLabel("Off");
 		lblStatusA.setForeground(Color.RED);
@@ -126,19 +139,20 @@ public class ServerGUI extends JFrame implements Observer {
 		contentPane.add(leftP, BorderLayout.WEST);
 		leftP.setLayout(new GridLayout(5, 1, 0, 0));
 
-		JLabel lblIConnAmount = new JLabel("Connections Amount:");
+		JLabel lblIConnAmount = new JLabel("Connections:");
 		leftP.add(lblIConnAmount);
 
-		lblConnAmountA = new JLabel("");
+		lblConnAmountA = new JLabel("0");
 		leftP.add(lblConnAmountA);
 
 		JPanel rightP = new JPanel();
 		contentPane.add(rightP, BorderLayout.EAST);
 
 		JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+		splitPane.setResizeWeight(0.5);
 		contentPane.add(splitPane);
 
-		tabP = new JTabbedPane(SwingConstants.TOP);
+		tabP = new ClosableTabbedPane();
 		splitPane.add(tabP, JSplitPane.TOP);
 
 		JPanel consoleP = new JPanel();
@@ -155,25 +169,23 @@ public class ServerGUI extends JFrame implements Observer {
 		consoleInput = new JTextField();
 		consoleInput.setColumns(10);
 		consoleInput.addActionListener(new ActionListener() {
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				String input = consoleInput.getText();
-				if (input == null || input == "") {
-					return;
-				}
+				if (input == null || input == "") { return; }
 				consoleInput.setText("");
-				serverMain.executeCommand(input);
+				serverMain.getCM().executeCommand(input, CommandType.SERVER);
 				commandManager.addCommandToList(input);
 			}
 		});
 		consoleInput.addKeyListener(new KeyListener() {
-			@Override
-			public void keyTyped(KeyEvent e) {
-			}
 
 			@Override
-			public void keyReleased(KeyEvent e) {
-			}
+			public void keyTyped(KeyEvent e) {}
+
+			@Override
+			public void keyReleased(KeyEvent e) {}
 
 			@Override
 			public void keyPressed(KeyEvent e) {
@@ -183,8 +195,7 @@ public class ServerGUI extends JFrame implements Observer {
 							|| !commandManager.wasExecuted(input)) {
 						consoleInput.setText(commandManager.getLastCommand());
 					} else {
-						String previousCommand = commandManager
-								.getPreviousCommand(input);
+						String previousCommand = commandManager.getPreviousCommand(input);
 						if (previousCommand != "") {
 							consoleInput.setText(previousCommand);
 						}
@@ -202,26 +213,23 @@ public class ServerGUI extends JFrame implements Observer {
 		consoleP.add(consoleInput, BorderLayout.SOUTH);
 
 		addWindowListener(new WindowListener() {
+
 			@Override
 			public void windowOpened(WindowEvent e) {
 				consoleInput.requestFocus();
 			}
 
 			@Override
-			public void windowIconified(WindowEvent e) {
-			}
+			public void windowIconified(WindowEvent e) {}
 
 			@Override
-			public void windowDeiconified(WindowEvent e) {
-			}
+			public void windowDeiconified(WindowEvent e) {}
 
 			@Override
-			public void windowDeactivated(WindowEvent e) {
-			}
+			public void windowDeactivated(WindowEvent e) {}
 
 			@Override
-			public void windowClosing(WindowEvent e) {
-			}
+			public void windowClosing(WindowEvent e) {}
 
 			@Override
 			public void windowClosed(WindowEvent e) {
@@ -230,8 +238,7 @@ public class ServerGUI extends JFrame implements Observer {
 			}
 
 			@Override
-			public void windowActivated(WindowEvent e) {
-			}
+			public void windowActivated(WindowEvent e) {}
 		});
 		CLogger.setConsole(console);
 	}
@@ -240,14 +247,18 @@ public class ServerGUI extends JFrame implements Observer {
 	public void update(Observable o, Object arg) {
 		if (o instanceof Connector) {
 			CLogger.info("N Conn Upd");
+			lblConnAmountA.setText(serverMain.getConnectionsAmount() + "");
 		}
 		if (o instanceof ServerMain) {
 			if (serverMain.isRunning()) {
 				lblStatusA.setText("On");
 				lblStatusA.setForeground(Color.GREEN);
+				tglbtnStartStop.setSelected(true);
 			} else {
 				lblStatusA.setText("Off");
 				lblStatusA.setForeground(Color.RED);
+				tglbtnStartStop.setSelected(false);
+				tabP.removeAll();
 			}
 		}
 	}
