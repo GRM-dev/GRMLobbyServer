@@ -2,7 +2,7 @@
 Used with [C#SocketClient](https://github.com/GRM-Group/CSharpSocketClient)
 
 #Build Status
-[![Build Status](http://teamcity.grm-dev.pl/app/rest/builds/buildType:NarutocraftPlMod_Build/statusIcon)](http://teamcity.grm-dev.pl/viewLog.html?buildTypeId=CSharpJavaOnSockets_JavaSocketServer&buildId=lastFinished) 
+[![Build Status](http://teamcity.grm-dev.pl/app/rest/builds/buildType:CSharpJavaOnSockets_JavaSocketServer_Build/statusIcon)](http://teamcity.grm-dev.pl/viewLog.html?buildTypeId=CSharpJavaOnSockets_JavaSocketServer&buildId=lastFinished) 
 
 #Dependency Status
 [![Dependency Status](https://www.versioneye.com/user/projects/554bb7c95d47f2511d000014/badge.svg?style=flat)](https://www.versioneye.com/user/projects/554bb7c95d47f2511d000014)
