@@ -64,9 +64,9 @@ public class CommandManager {
 				serverMain.startServer();
 				break;
 			case NONE :
-				break;
+				return false;
 			case ERROR :
-				break;
+				return false;
 			case JSON :
 				PacketParser.parseJSON(msg);
 				break;
@@ -84,7 +84,8 @@ public class CommandManager {
 				int id = it.next();
 				Connection connection = serverMain.getConnection(id);
 				try {
-					PacketParser.sendMessage(msg, connection.getSocket());
+					PacketParser.sendPacket(Commands.MSG.getCommandString() + " " + msg,
+							connection.getSocket());
 				}
 				catch (IOException e) {
 					e.printStackTrace();

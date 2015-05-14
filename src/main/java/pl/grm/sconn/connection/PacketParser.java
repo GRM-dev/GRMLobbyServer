@@ -1,8 +1,8 @@
 package pl.grm.sconn.connection;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.Socket;
 
 import org.json.JSONObject;
@@ -18,19 +18,18 @@ public class PacketParser {
 
 	}
 
-	public static void sendUserData(User user, Socket socket)
-			throws IOException {
+	public static void sendUserData(User user, Socket socket) throws IOException {
 		JSONObject obj = new JSONObject();
 		obj.put(user.getID() + "", new JSONObject(user));
 		String objS = obj.toString();
-		sendMessage(objS, socket);
+		sendPacket(objS, socket);
 	}
 
 	public static User receiveUserData(Socket socket) throws IOException {
-		sendMessage("!userdata", socket);
+		sendPacket("!userdata", socket);
 		String rec = "";
 		while (!rec.startsWith("{\"")) {
-			rec = receiveMessage(socket);
+			rec = receivePacket(socket);
 		}
 		try {
 			JSONObject obj = new JSONObject(rec);
@@ -49,28 +48,38 @@ public class PacketParser {
 		}
 	}
 
-	public static void sendMessage(String msg, Socket socket)
-			throws IOException {
-		OutputStream os = socket.getOutputStream();
-		byte[] msgBytes = msg.getBytes();
-		int msgLen = msgBytes.length;
-		byte[] msgLenBytes = convertIntToBytes(msgLen);
-		if (!socket.isClosed()) {
-			os.write(msgLenBytes);
-			os.write(msgBytes);
-			CLogger.info("Sended: " + msg);
-		}
+	public static void sendPacket(String msg, Socket socket) throws IOException {
+		DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+		out.write(msg.getBytes());
 	}
 
-	public static String receiveMessage(Socket socket) throws IOException {
-		InputStream is = socket.getInputStream();
-		byte[] lenBytes = new byte[4];
-		is.read(lenBytes, 0, 4);
-		int len = convertBytesToInt(lenBytes);
-		byte[] receivedBytes = new byte[len];
-		is.read(receivedBytes, 0, len);
-		String received = new String(receivedBytes, 0, len);
-		return received;
+	public static String receivePacket(Socket socket) throws IOException {
+		DataInputStream in = new DataInputStream(socket.getInputStream());
+		String str = "";
+		byte[] msgB = new byte[1000];
+		byte[] lenB = new byte[4];
+		boolean isFinished = false;
+		int read = 0;
+		for (int i = 0; i < 4; i++) {
+			lenB[i] = in.readByte();
+		}
+		int toRead = convertBytesToInt(lenB) - 4;
+
+		while (!isFinished) {
+
+			read = in.read(msgB);
+			str += new String(msgB, 0, read);
+			System.out.println(str.length() + "|" + toRead + " " + str);
+			if (str.length() == toRead) {
+				isFinished = true;
+			}
+		}
+		return str;
+	}
+
+	private static boolean isEmpty(byte[] lenBytes) {
+		return lenBytes[0] != 0 || lenBytes[1] != 0 || lenBytes[2] != 0
+				|| lenBytes[3] != 0;
 	}
 
 	private static int convertBytesToInt(byte[] lenBytes) {
@@ -79,8 +88,7 @@ public class PacketParser {
 	}
 
 	private static byte[] convertIntToBytes(int number) {
-		return new byte[]{(byte) (number & 0xff),
-				(byte) ((number >> 8) & 0xff), (byte) ((number >> 16) & 0xff),
-				(byte) ((number >> 24) & 0xff)};
+		return new byte[]{(byte) (number & 0xff), (byte) ((number >> 8) & 0xff),
+				(byte) ((number >> 16) & 0xff), (byte) ((number >> 24) & 0xff)};
 	}
 }

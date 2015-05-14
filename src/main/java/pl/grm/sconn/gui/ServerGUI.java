@@ -250,6 +250,7 @@ public class ServerGUI extends JFrame implements Observer {
 			lblConnAmountA.setText(serverMain.getConnectionsAmount() + "");
 		}
 		if (o instanceof ServerMain) {
+			lblConnAmountA.setText(serverMain.getConnectionsAmount() + "");
 			if (serverMain.isRunning()) {
 				lblStatusA.setText("On");
 				lblStatusA.setForeground(Color.GREEN);

@@ -43,21 +43,19 @@ public class Connection extends Thread {
 				user = PacketParser.receiveUserData(socket);
 				CLogger.info("Welcome " + user.getName() + "!");
 				tab.fillUP();
-				while (!received.contains("!close")) {
-					if (received != null & received != "") {
-						CLogger.info("Server received message: " + received);
-						PacketParser.sendMessage(received, socket);// TODO: stop
-																	// requested
-					}
-					received = PacketParser.receiveMessage(socket);
+				while (!received.contains("!close") && isConnected()) {
 					Commands cmm;
-					if (received.length() > 0
-							&& (cmm = ServerMain.instance.getCM().executeCommand(
-									received, CommandType.CLIENT)) != Commands.NONE) {
-						if (cmm == Commands.ERROR) {
-							CLogger.info("Command not executed");
-						} else {
-							CLogger.info("Command executed on connection " + ID);
+					received = null;
+					received = PacketParser.receivePacket(socket);
+					if (received != null && received.length() > 0) {
+						CLogger.info("Server received message: " + received);
+						if ((cmm = ServerMain.instance.getCM().executeCommand(received,
+								CommandType.CLIENT)) != Commands.NONE) {
+							if (cmm == Commands.ERROR) {
+								CLogger.info("Command not executed");
+							} else {
+								CLogger.info("Command executed on connection " + ID);
+							}
 						}
 					}
 				}
@@ -67,7 +65,6 @@ public class Connection extends Thread {
 			}
 			finally {
 				closeConnection();
-				setConnected(false);
 				CLogger.info("Connection " + ID + " | Disconnected");
 				ServerMain.instance.destroyConnection(ID);
 			}
@@ -76,11 +73,10 @@ public class Connection extends Thread {
 
 	public void configureConnection() throws IOException {
 		try {
-			setConnected(true);
 			CLogger.info("Connected on port " + port);
 			is = socket.getInputStream();
 			os = socket.getOutputStream();
-
+			setConnected(true);
 		}
 		catch (IOException e) {
 			if (!e.getMessage().contains("socket closed")) {
@@ -99,6 +95,7 @@ public class Connection extends Thread {
 		catch (IOException e) {
 			e.printStackTrace();
 		}
+		setConnected(false);
 	}
 
 	public int getID() {

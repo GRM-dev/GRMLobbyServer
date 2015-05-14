@@ -10,7 +10,8 @@ public enum Commands {
 	LIST("list", CommandType.SERVER),
 	STOP("stop", CommandType.SERVER),
 	START("start", CommandType.SERVER),
-	JSON("json", CommandType.BOTH);
+	JSON("json", CommandType.BOTH),
+	MSG("msg", CommandType.BOTH);
 
 	private String command;
 	private CommandType type;
