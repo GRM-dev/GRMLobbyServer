@@ -11,6 +11,7 @@ import pl.grm.sconn.commands.CommandType;
 import pl.grm.sconn.commands.Commands;
 import pl.grm.sconn.data.User;
 import pl.grm.sconn.gui.ConnectionTab;
+import pl.grm.sconn.json.JsonConvertException;
 
 public class Connection extends Thread {
 
@@ -49,8 +50,7 @@ public class Connection extends Thread {
 					received = PacketParser.receivePacket(socket);
 					if (received != null && received.length() > 0) {
 						CLogger.info("Server received message: " + received);
-						if ((cmm = ServerMain.instance.getCM().executeCommand(received,
-								CommandType.CLIENT)) != Commands.NONE) {
+						if ((cmm = ServerMain.instance.getCM().executeCommand(received, CommandType.CLIENT)) != Commands.NONE) {
 							if (cmm == Commands.ERROR) {
 								CLogger.info("Command not executed");
 							} else {
@@ -62,6 +62,9 @@ public class Connection extends Thread {
 			}
 			catch (IOException ex) {
 				ex.printStackTrace();
+			}
+			catch (JsonConvertException e) {
+				e.printStackTrace();
 			}
 			finally {
 				closeConnection();

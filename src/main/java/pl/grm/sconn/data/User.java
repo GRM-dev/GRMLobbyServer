@@ -1,8 +1,12 @@
 package pl.grm.sconn.data;
 
+import java.io.Serializable;
+
 import org.json.JSONObject;
 
-public class User {
+public class User implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 	private int ID;
 	private String name;
 	private int age;

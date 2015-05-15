@@ -37,8 +37,7 @@ public class CommandManager {
 		return executeCommand(command, msg, cType, null);
 	}
 
-	public boolean executeCommand(Commands command, String msg, CommandType cType,
-			Connection connection) {
+	public boolean executeCommand(Commands command, String msg, CommandType cType, Connection connection) {
 		if (cType == CommandType.NONE || cType == CommandType.BOTH) { return false; }
 		CLogger.info("Executing " + command.toString() + " command.");
 		switch (command) {
@@ -68,7 +67,7 @@ public class CommandManager {
 			case ERROR :
 				return false;
 			case JSON :
-				PacketParser.parseJSON(msg);
+				// JsonConverter.parseJSON(msg);
 				break;
 			default :
 				System.out.println("Bad command");
@@ -79,13 +78,11 @@ public class CommandManager {
 
 	private void sendAll(String msg) {
 		if (serverMain.getConnectionsAmount() != 0 && msg != null && msg.length() > 0) {
-			for (Iterator<Integer> it = serverMain.getConnectionsIDs().iterator(); it
-					.hasNext();) {
+			for (Iterator<Integer> it = serverMain.getConnectionsIDs().iterator(); it.hasNext();) {
 				int id = it.next();
 				Connection connection = serverMain.getConnection(id);
 				try {
-					PacketParser.sendPacket(Commands.MSG.getCommandString() + " " + msg,
-							connection.getSocket());
+					PacketParser.sendPacket(Commands.MSG.getCommandString() + " " + msg, connection.getSocket());
 				}
 				catch (IOException e) {
 					e.printStackTrace();
