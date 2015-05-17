@@ -5,8 +5,6 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
@@ -76,33 +74,15 @@ public class ServerGUI extends JFrame implements Observer {
 		menuBar.add(mnFile);
 
 		JMenuItem mntmClose = new JMenuItem("Close");
-		mntmClose.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				dispose();
-			}
-		});
+		mntmClose.addActionListener(e -> dispose());
 		mnFile.add(mntmClose);
 
 		JMenuItem mntmStartServer = new JMenuItem("Start Server");
-		mntmStartServer.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				serverMain.startServer();
-			}
-		});
+		mntmStartServer.addActionListener(e -> serverMain.startServer());
 		mnFile.add(mntmStartServer);
 
 		JMenuItem mntmStopServer = new JMenuItem("Stop Server");
-		mntmStopServer.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				serverMain.stopServer();
-			}
-		});
+		mntmStopServer.addActionListener(e -> serverMain.stopServer());
 		mnFile.add(mntmStopServer);
 
 		JMenu mnTools = new JMenu("Tools");
@@ -111,15 +91,11 @@ public class ServerGUI extends JFrame implements Observer {
 		JMenuItem mntmSettings = new JMenuItem("Settings ...");
 		mnTools.add(mntmSettings);
 		tglbtnStartStop = new JToggleButton("Start/Stop");
-		tglbtnStartStop.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (tglbtnStartStop.isSelected()) {
-					serverMain.startServer();
-				} else {
-					serverMain.stopServer();
-				}
+		tglbtnStartStop.addActionListener(e -> {
+			if (tglbtnStartStop.isSelected()) {
+				serverMain.startServer();
+			} else {
+				serverMain.stopServer();
 			}
 		});
 		menuBar.add(tglbtnStartStop);
@@ -168,16 +144,12 @@ public class ServerGUI extends JFrame implements Observer {
 
 		consoleInput = new JTextField();
 		consoleInput.setColumns(10);
-		consoleInput.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String input = consoleInput.getText();
-				if (input == null || input == "") { return; }
-				consoleInput.setText("");
-				serverMain.getCM().executeCommand(input, CommandType.SERVER);
-				commandManager.addCommandToList(input);
-			}
+		consoleInput.addActionListener(e -> {
+			String input = consoleInput.getText();
+			if (input == null || input == "") { return; }
+			consoleInput.setText("");
+			serverMain.getCM().executeCommand(input, CommandType.SERVER);
+			commandManager.addCommandToList(input);
 		});
 		consoleInput.addKeyListener(new KeyListener() {
 
@@ -191,8 +163,7 @@ public class ServerGUI extends JFrame implements Observer {
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_UP) {
 					String input = consoleInput.getText();
-					if (input == null || input == ""
-							|| !commandManager.wasExecuted(input)) {
+					if (input == null || input == "" || !commandManager.wasExecuted(input)) {
 						consoleInput.setText(commandManager.getLastCommand());
 					} else {
 						String previousCommand = commandManager.getPreviousCommand(input);
@@ -203,8 +174,7 @@ public class ServerGUI extends JFrame implements Observer {
 				} else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
 					String input = consoleInput.getText();
 					String nextCommand = commandManager.getNextCommand(input);
-					if (nextCommand != ""
-							|| input.equals(commandManager.getLastCommand())) {
+					if (nextCommand != "" || input.equals(commandManager.getLastCommand())) {
 						consoleInput.setText(nextCommand);
 					}
 				}

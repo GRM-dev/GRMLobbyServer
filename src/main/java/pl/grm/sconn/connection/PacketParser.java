@@ -28,6 +28,7 @@ public class PacketParser {
 		catch (IOException e) {
 			throw new JsonConvertException(e);
 		}
+		// return null;
 	}
 
 	public static void sendPacket(String msg, Socket socket) throws IOException {

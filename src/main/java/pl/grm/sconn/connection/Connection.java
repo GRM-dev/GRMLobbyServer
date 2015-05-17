@@ -15,7 +15,7 @@ import pl.grm.sconn.json.JsonConvertException;
 
 public class Connection extends Thread {
 
-	private int ID;
+	private final int ID;
 	private int port;
 	private InputStream is;
 	private OutputStream os;

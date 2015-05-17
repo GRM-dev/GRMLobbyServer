@@ -1,24 +1,26 @@
 package pl.grm.sconn.commands;
 
 public enum Commands {
-	NONE("", CommandType.NONE),
-	ERROR("error", CommandType.NONE),
-	SEND_ALL("sendall", CommandType.SERVER),
-	CLOSE("close", CommandType.BOTH),
-	CLOSECONN("closeConn", CommandType.BOTH),
-	CONNECTIONS("connections", CommandType.SERVER),
-	LIST("list", CommandType.SERVER),
-	STOP("stop", CommandType.SERVER),
-	START("start", CommandType.SERVER),
-	JSON("json", CommandType.BOTH),
-	MSG("msg", CommandType.BOTH);
+	NONE("", CommandType.NONE, false),
+	ERROR("error", CommandType.NONE, false),
+	SEND_ALL("sendall", CommandType.SERVER, true),
+	CLOSE("close", CommandType.SERVER, false),
+	CLOSECONN("closeConn", CommandType.BOTH, true),
+	CONNECTIONS("connections", CommandType.SERVER, true),
+	LIST("list", CommandType.BOTH, true),
+	STOP("stop", CommandType.SERVER, true),
+	START("start", CommandType.SERVER, false),
+	JSON("json", CommandType.BOTH, true),
+	MSG("msg", CommandType.SERVER, true);
 
 	private String command;
 	private CommandType type;
+	private boolean requireOnline;
 
-	private Commands(String name, CommandType type) {
+	private Commands(String name, CommandType type, boolean requireOnline) {
 		this.command = name;
 		this.type = type;
+		this.requireOnline = requireOnline;
 	}
 
 	public static Commands getCommand(String commS) {
@@ -43,5 +45,9 @@ public enum Commands {
 
 	public CommandType getType() {
 		return type;
+	}
+
+	public boolean hasToBeOnline() {
+		return requireOnline;
 	}
 }

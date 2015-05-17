@@ -113,8 +113,12 @@ public class JsonConverter {
 			if (file.isDirectory()) {
 				classes.addAll(findClasses(file, path + "/" + file.getName()));
 			} else if (file.getName().endsWith(".class")) {
-				classes.add((Class.forName(path.replace('/', '.') + "."
-						+ file.getName().substring(0, file.getName().length() - 6))));
+
+				Class<?> clazz = Class.forName(path.replace('/', '.') + "."
+						+ file.getName().substring(0, file.getName().length() - 6));
+				if (clazz.isAssignableFrom(JsonSerializable.class) || clazz.getSuperclass() == JsonSerializable.class) {
+					classes.add(clazz);
+				}
 			}
 		}
 		return classes;

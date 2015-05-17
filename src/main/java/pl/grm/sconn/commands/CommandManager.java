@@ -8,6 +8,7 @@ import pl.grm.sconn.CLogger;
 import pl.grm.sconn.ServerMain;
 import pl.grm.sconn.connection.Connection;
 import pl.grm.sconn.connection.PacketParser;
+import pl.grm.sconn.json.JsonParser;
 
 public class CommandManager {
 
@@ -37,43 +38,50 @@ public class CommandManager {
 		return executeCommand(command, msg, cType, null);
 	}
 
-	public boolean executeCommand(Commands command, String msg, CommandType cType, Connection connection) {
-		if (cType == CommandType.NONE || cType == CommandType.BOTH) { return false; }
-		CLogger.info("Executing " + command.toString() + " command.");
-		switch (command) {
-			case STOP :
-				serverMain.stopServer();
-				break;
-			case CONNECTIONS :
-				System.out.println(serverMain.getConnectionsAmount());
-				break;
-			case SEND_ALL :
-				sendAll(msg);
-				break;
-			case CLOSE :
-				serverMain.stopServer();
-				System.exit(0);
-				break;
-			case CLOSECONN :
-				serverMain.getConnection(0);
-				break;
-			case LIST :
-				break;
-			case START :
-				serverMain.startServer();
-				break;
-			case NONE :
-				return false;
-			case ERROR :
-				return false;
-			case JSON :
-				// JsonConverter.parseJSON(msg);
-				break;
-			default :
-				System.out.println("Bad command");
-				return false;
+	public boolean executeCommand(Commands command, String args, CommandType cType, Connection connection) {
+		try {
+			if (cType == CommandType.NONE || !(command.getType() == cType || command.getType() == CommandType.BOTH)
+					|| (command.hasToBeOnline() && !serverMain.isRunning())) { return false; }
+			CLogger.info("Executing " + command.toString() + " command.");
+			switch (command) {
+				case STOP :
+					serverMain.stopServer();
+					break;
+				case CONNECTIONS :
+					System.out.println(serverMain.getConnectionsAmount());
+					break;
+				case SEND_ALL :
+					sendAll(args);
+					break;
+				case CLOSE :
+					serverMain.stopServer();
+					System.exit(0);
+					break;
+				case CLOSECONN :
+					serverMain.getConnection(0);
+					break;
+				case LIST :
+					break;
+				case START :
+					serverMain.startServer();
+					break;
+				case NONE :
+					return false;
+				case ERROR :
+					return false;
+				case JSON :
+					JsonParser.parse(serverMain, args, connection);
+					break;
+				default :
+					System.out.println("Bad command");
+					return false;
+			}
+			return true;
 		}
-		return true;
+		catch (Exception e) {
+			CLogger.logException(e);
+			return false;
+		}
 	}
 
 	private void sendAll(String msg) {

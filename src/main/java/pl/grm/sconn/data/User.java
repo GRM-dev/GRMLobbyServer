@@ -1,10 +1,10 @@
 package pl.grm.sconn.data;
 
-import java.io.Serializable;
-
 import org.json.JSONObject;
 
-public class User implements Serializable {
+import pl.grm.sconn.json.JsonSerializable;
+
+public class User extends JsonSerializable {
 
 	private static final long serialVersionUID = 1L;
 	private int ID;
@@ -52,13 +52,12 @@ public class User implements Serializable {
 	}
 
 	@Override
-	public String toString() {
+	public JSONObject getAsJsonObject() {
 		JSONObject obj = new JSONObject();
 		obj.put("ID", ID);
 		obj.put("name", name);
 		obj.put("age", age);
 		obj.put("mail", mail);
-		String objS = obj.toString();
-		return objS;
+		return obj;
 	}
 }
