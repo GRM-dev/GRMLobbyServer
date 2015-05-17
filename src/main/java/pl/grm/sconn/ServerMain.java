@@ -91,20 +91,16 @@ public class ServerMain extends Observable {
 	}
 
 	private void startGUI() {
-		EventQueue.invokeLater(new Runnable() {
-
-			@Override
-			public void run() {
-				try {
-					sGUI = new ServerGUI(ServerMain.this);
-					connector.addObserver(sGUI);
-					addObserver(sGUI);
-					sGUI.setCommandManager(commandManager);
-					sGUI.setVisible(true);
-				}
-				catch (Exception e) {
-					e.printStackTrace();
-				}
+		EventQueue.invokeLater(() -> {
+			try {
+				sGUI = new ServerGUI(ServerMain.this);
+				connector.addObserver(sGUI);
+				addObserver(sGUI);
+				sGUI.setCommandManager(commandManager);
+				sGUI.setVisible(true);
+			}
+			catch (Exception e) {
+				e.printStackTrace();
 			}
 		});
 	}

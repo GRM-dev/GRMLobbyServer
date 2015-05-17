@@ -24,12 +24,14 @@ public class Connection extends Thread {
 	private Socket socket;
 	private User user;
 	private ConnectionTab tab;
+	private boolean closing;
 
 	public Connection(int id, Socket socket) {
 		this.ID = id;
 		this.socket = socket;
 		this.port = socket.getPort();
 		this.setName("ID: " + id);
+		this.setClosing(false);
 		this.setTab(new ConnectionTab(this));
 		ServerMain.instance.notifyObservers();
 	}
@@ -45,30 +47,34 @@ public class Connection extends Thread {
 				CLogger.info("Welcome " + user.getName() + "!");
 				tab.fillUP();
 				while (!received.contains("!close") && isConnected()) {
-					Commands cmm;
 					received = null;
 					received = PacketParser.receivePacket(socket);
 					if (received != null && received.length() > 0) {
-						CLogger.info("Server received message: " + received);
-						if ((cmm = ServerMain.instance.getCM().executeCommand(received, CommandType.CLIENT)) != Commands.NONE) {
-							if (cmm == Commands.ERROR) {
-								CLogger.info("Command not executed");
-							} else {
-								CLogger.info("Command executed on connection " + ID);
-							}
+						CLogger.info("Received packet: " + received);
+						if (ServerMain.instance.getCM().executeCommand(Commands.getCommand(received), received, false,
+								CommandType.CLIENT, this)) {
+							CLogger.info("Command executed on connection " + ID);
+						} else {
+							CLogger.info("Command not executed on connection " + ID);
 						}
 					}
 				}
 			}
 			catch (IOException ex) {
-				ex.printStackTrace();
+				if (!isClosing()) {
+					ex.printStackTrace();
+				}
 			}
 			catch (JsonConvertException e) {
 				e.printStackTrace();
 			}
 			finally {
 				closeConnection();
-				CLogger.info("Connection " + ID + " | Disconnected");
+				if (isClosing()) {
+					CLogger.info("Succesfully disconnected client with ID: " + ID);
+				} else {
+					CLogger.info("Connection " + ID + " Interrupted!");
+				}
 				ServerMain.instance.destroyConnection(ID);
 			}
 		}
@@ -151,5 +157,13 @@ public class Connection extends Thread {
 
 	public void setTab(ConnectionTab tab) {
 		this.tab = tab;
+	}
+
+	public boolean isClosing() {
+		return this.closing;
+	}
+
+	public void setClosing(boolean closing) {
+		this.closing = closing;
 	}
 }

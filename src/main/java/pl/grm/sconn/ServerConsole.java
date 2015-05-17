@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 import pl.grm.sconn.commands.CommandType;
+import pl.grm.sconn.commands.Commands;
 
 public class ServerConsole implements Runnable {
 
@@ -21,7 +22,7 @@ public class ServerConsole implements Runnable {
 		String command = "";
 		do {
 			command = readCommand();
-			serverMain.getCM().executeCommand(command, CommandType.SERVER);
+			serverMain.getCM().executeCommand(Commands.getCommand(command), command, false, CommandType.SERVER);
 		}
 		while (!stop);
 		serverMain.stopServer();

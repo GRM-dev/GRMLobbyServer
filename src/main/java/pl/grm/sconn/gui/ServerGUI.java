@@ -31,6 +31,7 @@ import pl.grm.sconn.CLogger;
 import pl.grm.sconn.ServerMain;
 import pl.grm.sconn.commands.CommandManager;
 import pl.grm.sconn.commands.CommandType;
+import pl.grm.sconn.commands.Commands;
 import pl.grm.sconn.connection.Connector;
 
 public class ServerGUI extends JFrame implements Observer {
@@ -148,7 +149,7 @@ public class ServerGUI extends JFrame implements Observer {
 			String input = consoleInput.getText();
 			if (input == null || input == "") { return; }
 			consoleInput.setText("");
-			serverMain.getCM().executeCommand(input, CommandType.SERVER);
+			serverMain.getCM().executeCommand(Commands.getCommand(input), input, false, CommandType.SERVER);
 			commandManager.addCommandToList(input);
 		});
 		consoleInput.addKeyListener(new KeyListener() {

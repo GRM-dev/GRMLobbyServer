@@ -11,7 +11,8 @@ public enum Commands {
 	STOP("stop", CommandType.SERVER, true),
 	START("start", CommandType.SERVER, false),
 	JSON("json", CommandType.BOTH, true),
-	MSG("msg", CommandType.SERVER, true);
+	MSG("msg", CommandType.SERVER, true),
+	SAY("say", CommandType.CLIENT, true);
 
 	private String command;
 	private CommandType type;
@@ -28,7 +29,9 @@ public enum Commands {
 			if (commT == NONE || commT == ERROR) {
 				continue;
 			}
-			if (commS.toLowerCase().startsWith(commT.getCommandString())) { return commT; }
+			commS = commS.toLowerCase() + " ";
+			String commandS = commT.getCommandString().toLowerCase() + " ";
+			if (commS.startsWith(commandS)) { return commT; }
 		}
 		return NONE;
 	}

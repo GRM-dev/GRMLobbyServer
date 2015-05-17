@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
+import pl.grm.sconn.commands.Commands;
 import pl.grm.sconn.data.User;
 import pl.grm.sconn.json.JsonConvertException;
 import pl.grm.sconn.json.JsonConverter;
@@ -28,7 +29,10 @@ public class PacketParser {
 		catch (IOException e) {
 			throw new JsonConvertException(e);
 		}
-		// return null;
+	}
+
+	public static void sendPacket(Commands command, String msg, Socket socket) throws IOException {
+		sendPacket(command.getCommandString() + " " + msg, socket);
 	}
 
 	public static void sendPacket(String msg, Socket socket) throws IOException {

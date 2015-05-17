@@ -20,26 +20,20 @@ public class CommandManager {
 		lastCommands = new ArrayList<>();
 	}
 
-	public Commands executeCommand(String cmm, CommandType cType) {
-		return executeCommand(cmm, cType, null);
+	public boolean executeCommand(Commands command, String msg, boolean offset, CommandType cType) {
+		return executeCommand(command, msg, offset, cType, null);
 	}
 
-	public Commands executeCommand(String cmm, CommandType cType, Connection connection) {
-		Commands command = Commands.getCommand(cmm);
-		String msg = Commands.getOffset(cmm);
-		if (executeCommand(command, msg, cType, connection)) {
-			return command;
-		} else {
-			return Commands.ERROR;
+	public boolean executeCommand(Commands command, String msg, boolean offset, CommandType cType, Connection connection) {
+		if (!offset) {
+			msg = Commands.getOffset(msg);
 		}
+		return executeCommand(command, msg, cType, connection);
 	}
 
-	public boolean executeCommand(Commands command, String msg, CommandType cType) {
-		return executeCommand(command, msg, cType, null);
-	}
-
-	public boolean executeCommand(Commands command, String args, CommandType cType, Connection connection) {
+	public synchronized boolean executeCommand(Commands command, String args, CommandType cType, Connection connection) {
 		try {
+			System.out.println(command);
 			if (cType == CommandType.NONE || !(command.getType() == cType || command.getType() == CommandType.BOTH)
 					|| (command.hasToBeOnline() && !serverMain.isRunning())) { return false; }
 			CLogger.info("Executing " + command.toString() + " command.");
@@ -58,7 +52,7 @@ public class CommandManager {
 					System.exit(0);
 					break;
 				case CLOSECONN :
-					serverMain.getConnection(0);
+					connection.setClosing(true);
 					break;
 				case LIST :
 					break;
@@ -71,6 +65,11 @@ public class CommandManager {
 					return false;
 				case JSON :
 					JsonParser.parse(serverMain, args, connection);
+					break;
+				case MSG :
+					break;
+				case SAY :
+					;
 					break;
 				default :
 					System.out.println("Bad command");
