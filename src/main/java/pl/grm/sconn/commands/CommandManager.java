@@ -64,7 +64,7 @@ public class CommandManager {
 				case ERROR :
 					return false;
 				case JSON :
-					JsonParser.parse(serverMain, args, connection);
+					JsonParser.parse(args, connection);
 					break;
 				case MSG :
 					break;

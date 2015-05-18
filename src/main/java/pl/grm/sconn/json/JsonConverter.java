@@ -50,7 +50,7 @@ public class JsonConverter {
 				break;
 
 			default :
-				return null;
+				break;
 
 		}
 		return obj;
@@ -113,7 +113,6 @@ public class JsonConverter {
 			if (file.isDirectory()) {
 				classes.addAll(findClasses(file, path + "/" + file.getName()));
 			} else if (file.getName().endsWith(".class")) {
-
 				Class<?> clazz = Class.forName(path.replace('/', '.') + "."
 						+ file.getName().substring(0, file.getName().length() - 6));
 				if (clazz.isAssignableFrom(JsonSerializable.class) || clazz.getSuperclass() == JsonSerializable.class) {
