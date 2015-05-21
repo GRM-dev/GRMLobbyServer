@@ -137,6 +137,7 @@ public class ServerGUI extends JFrame implements Observer {
 		splitPane.add(consoleP, JSplitPane.BOTTOM);
 
 		console = new JTextArea();
+		console.setEditable(false);
 		DefaultCaret caret = (DefaultCaret) console.getCaret();
 		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 

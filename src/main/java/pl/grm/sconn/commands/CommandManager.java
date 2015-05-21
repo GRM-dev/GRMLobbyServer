@@ -1,23 +1,53 @@
 package pl.grm.sconn.commands;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.HashMap;
 
 import pl.grm.sconn.CLogger;
 import pl.grm.sconn.ServerMain;
+import pl.grm.sconn.commands.basecommands.CLOSECONNCommand;
+import pl.grm.sconn.commands.basecommands.CLOSECommand;
+import pl.grm.sconn.commands.basecommands.CONNECTIONSCommand;
+import pl.grm.sconn.commands.basecommands.ERRORCommand;
+import pl.grm.sconn.commands.basecommands.JSONCommand;
+import pl.grm.sconn.commands.basecommands.LISTCommand;
+import pl.grm.sconn.commands.basecommands.MSGCommand;
+import pl.grm.sconn.commands.basecommands.NONECommand;
+import pl.grm.sconn.commands.basecommands.SAYCommand;
+import pl.grm.sconn.commands.basecommands.SENDALLCommand;
+import pl.grm.sconn.commands.basecommands.STARTCommand;
+import pl.grm.sconn.commands.basecommands.STOPCommand;
 import pl.grm.sconn.connection.Connection;
-import pl.grm.sconn.connection.PacketParser;
-import pl.grm.sconn.json.JsonParser;
 
 public class CommandManager {
 
 	private ServerMain serverMain;
 	private ArrayList<String> lastCommands;
+	private HashMap<Commands, ICommand> commands;
 
 	public CommandManager(ServerMain serverMain) {
 		this.serverMain = serverMain;
 		lastCommands = new ArrayList<>();
+		commands = new HashMap<>();
+		init();
+	}
+
+	/**
+	 * Initialize base commands
+	 */
+	private void init() {
+		commands.put(Commands.CLOSE, new CLOSECommand());
+		commands.put(Commands.CLOSECONN, new CLOSECONNCommand());
+		commands.put(Commands.CONNECTIONS, new CONNECTIONSCommand());
+		commands.put(Commands.ERROR, new ERRORCommand());
+		commands.put(Commands.JSON, new JSONCommand());
+		commands.put(Commands.LIST, new LISTCommand());
+		commands.put(Commands.MSG, new MSGCommand());
+		commands.put(Commands.NONE, new NONECommand());
+		commands.put(Commands.SAY, new SAYCommand());
+		commands.put(Commands.SEND_ALL, new SENDALLCommand());
+		commands.put(Commands.START, new STARTCommand());
+		commands.put(Commands.STOP, new STOPCommand());
 	}
 
 	public boolean executeCommand(Commands command, String msg, boolean offset, CommandType cType) {
@@ -37,65 +67,12 @@ public class CommandManager {
 			if (cType == CommandType.NONE || !(command.getType() == cType || command.getType() == CommandType.BOTH)
 					|| (command.hasToBeOnline() && !serverMain.isRunning())) { return false; }
 			CLogger.info("Executing " + command.toString() + " command.");
-			switch (command) {
-				case STOP :
-					serverMain.stopServer();
-					break;
-				case CONNECTIONS :
-					System.out.println(serverMain.getConnectionsAmount());
-					break;
-				case SEND_ALL :
-					sendAll(args);
-					break;
-				case CLOSE :
-					serverMain.stopServer();
-					System.exit(0);
-					break;
-				case CLOSECONN :
-					connection.setClosing(true);
-					break;
-				case LIST :
-					break;
-				case START :
-					serverMain.startServer();
-					break;
-				case NONE :
-					return false;
-				case ERROR :
-					return false;
-				case JSON :
-					JsonParser.parse(args, connection);
-					break;
-				case MSG :
-					break;
-				case SAY :
-					;
-					break;
-				default :
-					System.out.println("Bad command");
-					return false;
-			}
-			return true;
+			ICommand cmm = commands.get(command);
+			return cmm.execute(command, args, cType, connection);
 		}
 		catch (Exception e) {
 			CLogger.logException(e);
 			return false;
-		}
-	}
-
-	private void sendAll(String msg) {
-		if (serverMain.getConnectionsAmount() != 0 && msg != null && msg.length() > 0) {
-			for (Iterator<Integer> it = serverMain.getConnectionsIDs().iterator(); it.hasNext();) {
-				int id = it.next();
-				Connection connection = serverMain.getConnection(id);
-				try {
-					PacketParser.sendPacket(Commands.MSG.getCommandString() + " " + msg, connection.getSocket());
-				}
-				catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-
 		}
 	}
 
