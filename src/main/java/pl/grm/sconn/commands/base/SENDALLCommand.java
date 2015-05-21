@@ -1,7 +1,7 @@
 /**
  * 
  */
-package pl.grm.sconn.commands.basecommands;
+package pl.grm.sconn.commands.base;
 
 import java.io.IOException;
 import java.util.Iterator;

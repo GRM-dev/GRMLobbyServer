@@ -46,14 +46,15 @@ public class Connection extends Thread {
 				user = PacketParser.receiveUserData(socket);
 				CLogger.info("Welcome " + user.getName() + "!");
 				tab.fillUP();
-				while (!received.contains("!close") && isConnected()) {
+				while (isConnected()) {
 					received = null;
 					received = PacketParser.receivePacket(socket);
 					if (received != null && received.length() > 0) {
 						CLogger.info("Received packet: " + received);
-						if (ServerMain.instance.getCM().executeCommand(Commands.getCommand(received), received, false,
-								CommandType.CLIENT, this)) {
-							CLogger.info("Command executed on connection " + ID);
+						Commands command = Commands.getCommand(received);
+						if (ServerMain.instance.getCM().executeCommand(command, received, false, CommandType.CLIENT,
+								this)) {
+							CLogger.info("Command " + command.toString() + " executed on connection " + ID);
 						} else {
 							CLogger.info("Command not executed on connection " + ID);
 						}
@@ -139,7 +140,7 @@ public class Connection extends Thread {
 		return initialized;
 	}
 
-	public void setInitialized(boolean initialized) {
+	private void setInitialized(boolean initialized) {
 		this.initialized = initialized;
 	}
 
@@ -155,7 +156,7 @@ public class Connection extends Thread {
 		return tab;
 	}
 
-	public void setTab(ConnectionTab tab) {
+	private void setTab(ConnectionTab tab) {
 		this.tab = tab;
 	}
 

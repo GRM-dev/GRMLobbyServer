@@ -5,18 +5,18 @@ import java.util.HashMap;
 
 import pl.grm.sconn.CLogger;
 import pl.grm.sconn.ServerMain;
-import pl.grm.sconn.commands.basecommands.CLOSECONNCommand;
-import pl.grm.sconn.commands.basecommands.CLOSECommand;
-import pl.grm.sconn.commands.basecommands.CONNECTIONSCommand;
-import pl.grm.sconn.commands.basecommands.ERRORCommand;
-import pl.grm.sconn.commands.basecommands.JSONCommand;
-import pl.grm.sconn.commands.basecommands.LISTCommand;
-import pl.grm.sconn.commands.basecommands.MSGCommand;
-import pl.grm.sconn.commands.basecommands.NONECommand;
-import pl.grm.sconn.commands.basecommands.SAYCommand;
-import pl.grm.sconn.commands.basecommands.SENDALLCommand;
-import pl.grm.sconn.commands.basecommands.STARTCommand;
-import pl.grm.sconn.commands.basecommands.STOPCommand;
+import pl.grm.sconn.commands.base.CLOSECONNCommand;
+import pl.grm.sconn.commands.base.CLOSECommand;
+import pl.grm.sconn.commands.base.CONNECTIONSCommand;
+import pl.grm.sconn.commands.base.ERRORCommand;
+import pl.grm.sconn.commands.base.JSONCommand;
+import pl.grm.sconn.commands.base.LISTCommand;
+import pl.grm.sconn.commands.base.MSGCommand;
+import pl.grm.sconn.commands.base.NONECommand;
+import pl.grm.sconn.commands.base.SAYCommand;
+import pl.grm.sconn.commands.base.SENDALLCommand;
+import pl.grm.sconn.commands.base.STARTCommand;
+import pl.grm.sconn.commands.base.STOPCommand;
 import pl.grm.sconn.connection.Connection;
 
 public class CommandManager {

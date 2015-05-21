@@ -1,9 +1,8 @@
 /**
  * 
  */
-package pl.grm.sconn.commands.basecommands;
+package pl.grm.sconn.commands.base;
 
-import pl.grm.sconn.ServerMain;
 import pl.grm.sconn.commands.CommandType;
 import pl.grm.sconn.commands.Commands;
 import pl.grm.sconn.commands.ICommand;
@@ -13,7 +12,7 @@ import pl.grm.sconn.connection.Connection;
  * @author Levvy055
  *
  */
-public class CLOSECommand implements ICommand {
+public class SAYCommand implements ICommand {
 
 	/*
 	 * (non-Javadoc)
@@ -24,9 +23,8 @@ public class CLOSECommand implements ICommand {
 	 * pl.grm.sconn.connection.Connection)
 	 */
 	@Override
-	public boolean execute(Commands command, String args, CommandType cType, Connection connection) {
-		ServerMain.instance.stopServer();
-		System.exit(0);
+	public boolean execute(Commands command, String args, CommandType cType, Connection connection) throws Exception {
+		// TODO Auto-generated method stub
 		return true;
 	}
 

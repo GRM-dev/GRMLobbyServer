@@ -1,7 +1,7 @@
 /**
  * 
  */
-package pl.grm.sconn.commands.basecommands;
+package pl.grm.sconn.commands.base;
 
 import pl.grm.sconn.ServerMain;
 import pl.grm.sconn.commands.CommandType;

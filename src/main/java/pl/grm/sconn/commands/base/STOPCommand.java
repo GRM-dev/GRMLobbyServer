@@ -1,7 +1,7 @@
 /**
  * 
  */
-package pl.grm.sconn.commands.basecommands;
+package pl.grm.sconn.commands.base;
 
 import pl.grm.sconn.ServerMain;
 import pl.grm.sconn.commands.CommandType;
@@ -13,7 +13,7 @@ import pl.grm.sconn.connection.Connection;
  * @author Levvy055
  *
  */
-public class STARTCommand implements ICommand {
+public class STOPCommand implements ICommand {
 
 	/*
 	 * (non-Javadoc)
@@ -25,7 +25,7 @@ public class STARTCommand implements ICommand {
 	 */
 	@Override
 	public boolean execute(Commands command, String args, CommandType cType, Connection connection) throws Exception {
-		ServerMain.instance.startServer();
+		ServerMain.instance.stopServer();
 		return true;
 	}
 
