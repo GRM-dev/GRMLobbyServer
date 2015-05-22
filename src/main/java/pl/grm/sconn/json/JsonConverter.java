@@ -21,16 +21,19 @@ public class JsonConverter {
 		if (classNames == null) {
 			init();
 		}
-		String name = new JSONObject(msg).getString("name");
-		return classNames.contains(name);
+		String type = new JSONObject(msg).getString("type");
+		return classNames.contains(type);
 	}
 
-	public static Object convertToObject(String msg) throws IOException, JsonConvertException {
+	public static DCObject convertToObject(String msg) throws IOException, JsonConvertException {
 		try {
 			if (JsonConverter.canBeDeserializated(msg)) {
 				JSONObject jsonObject = new JSONObject(msg);
-				String name = new JSONObject(msg).getString("name");
-				return getObject(name, jsonObject);
+				String type = jsonObject.getString("type");
+				int action = jsonObject.getInt("action");
+				JSONObject jObj = jsonObject.getJSONObject("object");
+				Object convObj = getObject(type, jObj);
+				return new DCObject(convObj, action);
 			}
 		}
 		catch (NullPointerException e) {
@@ -42,11 +45,11 @@ public class JsonConverter {
 		throw new JsonConvertException("Cannot be deserializated");
 	}
 
-	private static Object getObject(String name, JSONObject jsonObject) {
+	private static Object getObject(String type, JSONObject jObj) {
 		Object obj = null;
-		switch (name) {
+		switch (type) {
 			case "User" :
-				obj = toUser(jsonObject.getJSONObject("object"));
+				obj = toUser(jObj);
 				break;
 
 			default :

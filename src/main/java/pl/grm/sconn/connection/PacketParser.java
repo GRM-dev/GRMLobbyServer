@@ -7,6 +7,7 @@ import java.net.Socket;
 
 import pl.grm.sconn.commands.Commands;
 import pl.grm.sconn.data.User;
+import pl.grm.sconn.json.DCObject;
 import pl.grm.sconn.json.JsonConvertException;
 import pl.grm.sconn.json.JsonConverter;
 
@@ -24,7 +25,8 @@ public class PacketParser {
 			rec = receivePacket(socket);
 		}
 		try {
-			return (User) JsonConverter.convertToObject(rec);
+			DCObject dcObj = JsonConverter.convertToObject(rec);
+			return dcObj.getUser();
 		}
 		catch (IOException e) {
 			throw new JsonConvertException(e);

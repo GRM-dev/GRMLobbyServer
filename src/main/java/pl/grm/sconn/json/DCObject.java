@@ -7,10 +7,12 @@ public class DCObject {
 
 	private Object obj;
 	private Class<? extends JsonSerializable> clazz;
+	private int action;
 
 	@SuppressWarnings("unchecked")
-	DCObject(Object obj) {
+	DCObject(Object obj, int action) {
 		this.obj = obj;
+		this.action = action;
 		if (obj.getClass().isAssignableFrom(JsonSerializable.class)
 				|| obj.getClass().getSuperclass() == JsonSerializable.class) {
 			this.clazz = (Class<? extends JsonSerializable>) obj.getClass();
@@ -21,8 +23,11 @@ public class DCObject {
 	}
 
 	public User getUser() {
-		if (!clazz.isAssignableFrom(JsonSerializable.class)) { return null; }
-		return (User) obj;
+		if (clazz == User.class) { return (User) obj; }
+		return null;
 	}
 
+	public int getAction() {
+		return this.action;
+	}
 }
