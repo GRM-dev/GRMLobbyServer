@@ -37,9 +37,9 @@ public class PacketParser {
 		sendPacket(command.getCommandString() + " " + msg, socket);
 	}
 
-	public static void sendPacket(String msg, Socket socket) throws IOException {
+	public static void sendPacket(String str, Socket socket) throws IOException {
 		DataOutputStream out = new DataOutputStream(socket.getOutputStream());
-		out.write(msg.getBytes());
+		out.write(str.getBytes());
 	}
 
 	public static String receivePacket(Socket socket) throws IOException {

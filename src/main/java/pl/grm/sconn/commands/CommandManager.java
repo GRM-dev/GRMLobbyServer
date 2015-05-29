@@ -50,17 +50,61 @@ public class CommandManager {
 		commands.put(Commands.STOP, new STOPCommand());
 	}
 
-	public boolean executeCommand(Commands command, String msg, boolean offset, CommandType cType) {
-		return executeCommand(command, msg, offset, cType, null);
+	/**
+	 * Executes command
+	 * 
+	 * @param command
+	 *            command to execute
+	 * @param args
+	 *            arguments of command
+	 * @param offset
+	 *            if args contains command string set it to false.\n When args
+	 *            are just offset than true.
+	 * @param cType
+	 *            command invoked by server or client
+	 * @return true if correctly executed
+	 */
+	public boolean executeCommand(Commands command, String args, boolean offset, CommandType cType) {
+		return executeCommand(command, args, offset, cType, null);
 	}
 
-	public boolean executeCommand(Commands command, String msg, boolean offset, CommandType cType, Connection connection) {
+	/**
+	 * Executes command
+	 * 
+	 * @param command
+	 *            command to execute
+	 * @param args
+	 *            arguments of command
+	 * @param offset
+	 *            if args contains command string set it to false.\n When args
+	 *            are just offset than true.
+	 * @param cType
+	 *            command invoked by server or client
+	 * @param connection
+	 *            connection on which commend should be executed
+	 * @return true if correctly executed
+	 */
+	public boolean executeCommand(Commands command, String args, boolean offset, CommandType cType,
+			Connection connection) {
 		if (!offset) {
-			msg = Commands.getOffset(msg);
+			args = Commands.getOffset(args);
 		}
-		return executeCommand(command, msg, cType, connection);
+		return executeCommand(command, args, cType, connection);
 	}
 
+	/**
+	 * Executes command
+	 * 
+	 * @param command
+	 *            command to execute
+	 * @param args
+	 *            arguments of command
+	 * @param cType
+	 *            command invoked by server or client
+	 * @param connection
+	 *            connection on which commend should be executed
+	 * @return true if correctly executed
+	 */
 	public synchronized boolean executeCommand(Commands command, String args, CommandType cType, Connection connection) {
 		try {
 			System.out.println(command);

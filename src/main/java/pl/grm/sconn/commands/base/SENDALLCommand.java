@@ -3,7 +3,6 @@
  */
 package pl.grm.sconn.commands.base;
 
-import java.io.IOException;
 import java.util.Iterator;
 
 import pl.grm.sconn.ServerMain;
@@ -11,7 +10,6 @@ import pl.grm.sconn.commands.CommandType;
 import pl.grm.sconn.commands.Commands;
 import pl.grm.sconn.commands.ICommand;
 import pl.grm.sconn.connection.Connection;
-import pl.grm.sconn.connection.PacketParser;
 
 /**
  * @author Levvy055
@@ -34,12 +32,7 @@ public class SENDALLCommand implements ICommand {
 			for (Iterator<Integer> it = serverMain.getConnectionsIDs().iterator(); it.hasNext();) {
 				int id = it.next();
 				Connection conn = serverMain.getConnection(id);
-				try {
-					PacketParser.sendPacket(Commands.MSG.getCommandString() + " " + args, conn.getSocket());
-				}
-				catch (IOException e) {
-					e.printStackTrace();
-				}
+				ServerMain.instance.getCM().executeCommand(Commands.MSG, args, true, cType, conn);
 			}
 
 		}
