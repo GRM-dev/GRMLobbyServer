@@ -5,14 +5,14 @@ package pl.grm.sconn.commands.base;
 
 import pl.grm.sconn.commands.CommandType;
 import pl.grm.sconn.commands.Commands;
-import pl.grm.sconn.commands.ICommand;
+import pl.grm.sconn.commands.IBaseCommand;
 import pl.grm.sconn.connection.Connection;
 
 /**
  * @author Levvy055
  *
  */
-public class NONECommand implements ICommand {
+public class NONECommand implements IBaseCommand {
 
 	/*
 	 * (non-Javadoc)

@@ -7,7 +7,7 @@ import java.io.IOException;
 
 import pl.grm.sconn.commands.CommandType;
 import pl.grm.sconn.commands.Commands;
-import pl.grm.sconn.commands.ICommand;
+import pl.grm.sconn.commands.IBaseCommand;
 import pl.grm.sconn.connection.Connection;
 import pl.grm.sconn.json.JsonConvertException;
 import pl.grm.sconn.json.JsonParser;
@@ -16,7 +16,7 @@ import pl.grm.sconn.json.JsonParser;
  * @author Levvy055
  *
  */
-public class JSONCommand implements ICommand {
+public class JSONCommand implements IBaseCommand {
 
 	/*
 	 * (non-Javadoc)

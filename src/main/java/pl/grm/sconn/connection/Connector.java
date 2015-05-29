@@ -14,12 +14,13 @@ public class Connector extends Observable implements Runnable {
 	private ServerMain serverMain;
 	private int port;
 	private ServerSocket serverSocket;
+	private boolean running;
 
 	public Connector(ServerMain serverMain) throws IOException {
 		this.serverMain = serverMain;
 		port = ServerMain.EST_PORT;
 		if (isAvailable(port)) {
-			serverSocket = new ServerSocket(port);
+			start();
 		} else {
 			throw new IOException("Port " + port + " not available!");
 		}
@@ -41,13 +42,18 @@ public class Connector extends Observable implements Runnable {
 
 	public void waitForNewConnection() throws IOException {
 		CLogger.info("Server listening on port " + port);
-		Socket socket = serverSocket.accept();
-		int nextID = nextID();
-		CLogger.info("New connection established: ID=" + nextID + " localPort="
-				+ socket.getInetAddress());
-		Connection connection = new Connection(nextID, socket);
-		serverMain.addConnection(nextID, connection);
-		connection.start();
+		Socket socket = null;
+		try {
+			socket = serverSocket.accept();
+			int nextID = nextID();
+			CLogger.info("New connection established: ID=" + nextID + " localPort=" + socket.getInetAddress());
+			Connection connection = new Connection(nextID, socket);
+			serverMain.addConnection(nextID, connection);
+			connection.start();
+		}
+		catch (IOException e) {
+			if (running) { throw e; }
+		}
 		setChanged();
 		notifyObservers();
 	}
@@ -57,6 +63,24 @@ public class Connector extends Observable implements Runnable {
 			if (!serverMain.containsConnection(id)) { return id; }
 		}
 		return 0;
+	}
+
+	public void start() throws IOException {
+		if (serverSocket == null) {
+			serverSocket = new ServerSocket(port);
+		}
+		running = true;
+	}
+
+	public void stop() {
+		running = false;
+		try {
+			serverSocket.close();
+			serverSocket = null;
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public static boolean isAvailable(int port) {

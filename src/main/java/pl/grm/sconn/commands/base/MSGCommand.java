@@ -7,7 +7,7 @@ import java.io.IOException;
 
 import pl.grm.sconn.commands.CommandType;
 import pl.grm.sconn.commands.Commands;
-import pl.grm.sconn.commands.ICommand;
+import pl.grm.sconn.commands.IBaseCommand;
 import pl.grm.sconn.connection.Connection;
 import pl.grm.sconn.connection.PacketParser;
 
@@ -15,7 +15,7 @@ import pl.grm.sconn.connection.PacketParser;
  * @author Levvy055
  *
  */
-public class MSGCommand implements ICommand {
+public class MSGCommand implements IBaseCommand {
 
 	/*
 	 * (non-Javadoc)

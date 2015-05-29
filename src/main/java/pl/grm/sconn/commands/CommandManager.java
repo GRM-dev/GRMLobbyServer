@@ -23,12 +23,13 @@ public class CommandManager {
 
 	private ServerMain serverMain;
 	private ArrayList<String> lastCommands;
-	private HashMap<Commands, ICommand> commands;
+	private HashMap<Commands, IBaseCommand> baseCommands;
+	private HashMap<JSONOperations, IJSONOperation> jsonOperations;
 
 	public CommandManager(ServerMain serverMain) {
 		this.serverMain = serverMain;
 		lastCommands = new ArrayList<>();
-		commands = new HashMap<>();
+		baseCommands = new HashMap<>();
 		init();
 	}
 
@@ -36,18 +37,18 @@ public class CommandManager {
 	 * Initialize base commands
 	 */
 	private void init() {
-		commands.put(Commands.CLOSE, new CLOSECommand());
-		commands.put(Commands.CLOSECONN, new CLOSECONNCommand());
-		commands.put(Commands.CONNECTIONS, new CONNECTIONSCommand());
-		commands.put(Commands.ERROR, new ERRORCommand());
-		commands.put(Commands.JSON, new JSONCommand());
-		commands.put(Commands.LIST, new LISTCommand());
-		commands.put(Commands.MSG, new MSGCommand());
-		commands.put(Commands.NONE, new NONECommand());
-		commands.put(Commands.SAY, new SAYCommand());
-		commands.put(Commands.SEND_ALL, new SENDALLCommand());
-		commands.put(Commands.START, new STARTCommand());
-		commands.put(Commands.STOP, new STOPCommand());
+		baseCommands.put(Commands.CLOSE, new CLOSECommand());
+		baseCommands.put(Commands.CLOSECONN, new CLOSECONNCommand());
+		baseCommands.put(Commands.CONNECTIONS, new CONNECTIONSCommand());
+		baseCommands.put(Commands.ERROR, new ERRORCommand());
+		baseCommands.put(Commands.JSON, new JSONCommand());
+		baseCommands.put(Commands.LIST, new LISTCommand());
+		baseCommands.put(Commands.MSG, new MSGCommand());
+		baseCommands.put(Commands.NONE, new NONECommand());
+		baseCommands.put(Commands.SAY, new SAYCommand());
+		baseCommands.put(Commands.SEND_ALL, new SENDALLCommand());
+		baseCommands.put(Commands.START, new STARTCommand());
+		baseCommands.put(Commands.STOP, new STOPCommand());
 	}
 
 	/**
@@ -111,7 +112,7 @@ public class CommandManager {
 			if (cType == CommandType.NONE || !(command.getType() == cType || command.getType() == CommandType.BOTH)
 					|| (command.hasToBeOnline() && !serverMain.isRunning())) { return false; }
 			CLogger.info("Executing " + command.toString() + " command.");
-			ICommand cmm = commands.get(command);
+			IBaseCommand cmm = baseCommands.get(command);
 			return cmm.execute(command, args, cType, connection);
 		}
 		catch (Exception e) {

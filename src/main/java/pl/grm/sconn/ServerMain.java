@@ -11,6 +11,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import pl.grm.sconn.commands.CommandManager;
+import pl.grm.sconn.commands.CommandType;
+import pl.grm.sconn.commands.Commands;
 import pl.grm.sconn.connection.Connection;
 import pl.grm.sconn.connection.Connector;
 import pl.grm.sconn.gui.ServerGUI;
@@ -63,10 +65,17 @@ public class ServerMain extends Observable {
 		if (!isRunning()) {
 			CLogger.info("Starting server");
 			executor = Executors.newFixedThreadPool(CONNECTIONS_MAX_POOL);
-			connectorThread = new Thread(connector);
-			connectorThread.start();
-			setRunning(true);
-			setChanged();
+			try {
+				connector.start();
+				connectorThread = new Thread(connector);
+				connectorThread.start();
+				setRunning(true);
+				setChanged();
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+				CLogger.logException(e);
+			}
 			notifyObservers();
 		}
 	}
@@ -75,9 +84,11 @@ public class ServerMain extends Observable {
 		if (isRunning()) {
 			CLogger.info("Stopping server ...\nConnection amount on stop " + getConnections().size());
 			executor.shutdownNow();
+			connector.stop();
 			for (Iterator<Integer> it = getConnectionsIDs().iterator(); it.hasNext();) {
 				int id = it.next();
 				Connection connection = getConnection(id);
+				commandManager.executeCommand(Commands.CLOSECONN, null, CommandType.SERVER, connection);
 				connection.closeConnection();
 			}
 			connections.clear();

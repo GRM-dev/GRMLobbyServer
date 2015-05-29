@@ -8,14 +8,14 @@ import java.util.Iterator;
 import pl.grm.sconn.ServerMain;
 import pl.grm.sconn.commands.CommandType;
 import pl.grm.sconn.commands.Commands;
-import pl.grm.sconn.commands.ICommand;
+import pl.grm.sconn.commands.IBaseCommand;
 import pl.grm.sconn.connection.Connection;
 
 /**
  * @author Levvy055
  *
  */
-public class SENDALLCommand implements ICommand {
+public class SENDALLCommand implements IBaseCommand {
 
 	/*
 	 * (non-Javadoc)
@@ -32,11 +32,9 @@ public class SENDALLCommand implements ICommand {
 			for (Iterator<Integer> it = serverMain.getConnectionsIDs().iterator(); it.hasNext();) {
 				int id = it.next();
 				Connection conn = serverMain.getConnection(id);
-				ServerMain.instance.getCM().executeCommand(Commands.MSG, args, true, cType, conn);
+				serverMain.getCM().executeCommand(Commands.MSG, args, true, cType, conn);
 			}
-
 		}
 		return true;
 	}
-
 }
