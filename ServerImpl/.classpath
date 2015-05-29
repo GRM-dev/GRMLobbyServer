@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src/main/java"/>
+	<classpathentry kind="src" path="src/main/resources"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry exported="true" kind="lib" path="N:/Users/Lukasz/.gradle/caches/modules-2/files-2.1/com.google.guava/guava/18.0/cce0823396aa693798f8882e64213b1772032b09/guava-18.0.jar" sourcepath="N:/Users/Lukasz/.gradle/caches/modules-2/files-2.1/com.google.guava/guava/18.0/ad97fe8faaf01a3d3faacecd58e8fa6e78a973ca/guava-18.0-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="N:/Users/Lukasz/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-lang3/3.4/5fe28b9518e58819180a43a850fbc0dd24b7c050/commons-lang3-3.4.jar" sourcepath="N:/Users/Lukasz/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-lang3/3.4/b49dafc9cfef24c356827f322e773e7c26725dd2/commons-lang3-3.4-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="N:/Users/Lukasz/.gradle/caches/modules-2/files-2.1/org.json/json/20141113/c590c04911645db2f53b9bbefd5c3fcd8ca5581d/json-20141113.jar" sourcepath="N:/Users/Lukasz/.gradle/caches/modules-2/files-2.1/org.json/json/20141113/4adae7a8a0e03a2dcd833c7d72dcc5de651fbfb4/json-20141113-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="N:/Users/Lukasz/.gradle/caches/modules-2/files-2.1/mysql/mysql-connector-java/5.1.35/b6ac941b7288376a7e8bc6490264bbd4427fb94e/mysql-connector-java-5.1.35.jar" sourcepath="N:/Users/Lukasz/.gradle/caches/modules-2/files-2.1/mysql/mysql-connector-java/5.1.35/f5c644543148f028880ab3573ba8095faa71d9f8/mysql-connector-java-5.1.35-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="N:/Users/Lukasz/.gradle/caches/modules-2/files-2.1/org.ini4j/ini4j/0.5.4/4a3ee4146a90c619b20977d65951825f5675b560/ini4j-0.5.4.jar" sourcepath="N:/Users/Lukasz/.gradle/caches/modules-2/files-2.1/org.ini4j/ini4j/0.5.4/740798033b8a76f216de6a787684a6206a6f6a03/ini4j-0.5.4-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="N:/Users/Lukasz/.gradle/caches/modules-2/files-2.1/junit/junit/4.4/8f35ee1f35d2dadbb5029991449ee90c1bab4d4a/junit-4.4.jar" sourcepath="N:/Users/Lukasz/.gradle/caches/modules-2/files-2.1/junit/junit/4.4/c6fcccd240bf9a32bb6f16917a70a416b0d249a8/junit-4.4-sources.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/GRMLobbyServerAPI"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

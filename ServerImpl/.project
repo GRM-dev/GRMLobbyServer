@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>ServerAPI</name>
-	<comment>GRM-Lobby Server API working on Sockets to connect with CSharp Clients</comment>
+	<name>ServerImpl</name>
+	<comment>GRM-Lobby Server Base Implementation working on Sockets to connect with CSharp Clients</comment>
 	<projects/>
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>

@@ -6,11 +6,10 @@ import static org.junit.Assert.fail;
 
 import java.sql.SQLException;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 
-import pl.grm.sconn.data.User;
+import pl.grm.lobby.data.User;
+import pl.grm.lobby.database.*;
 
 public class TestMySQLUserManaging {
 	private static MySQLUserManager userDBManager;
