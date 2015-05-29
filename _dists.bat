@@ -1,0 +1,1 @@
+cmd.exe /k "gradlew.bat installDist distZip distTar & pause"

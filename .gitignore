@@ -57,8 +57,9 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-/bin/
-/.gradle/
-/build/
-/.settings/
+*/bin/
+*/.gradle/
+.gradle
+*/build/
+*/.settings/
 *.log
