@@ -3,7 +3,6 @@
  */
 package pl.grm.sconn.commands;
 
-
 /**
  * @author Levvy055
  *

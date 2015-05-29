@@ -16,13 +16,24 @@ public class JsonConverter {
 
 	private static List<String> classNames;
 
-	public static boolean canBeDeserializated(String msg) throws NullPointerException, ClassNotFoundException,
-			IOException {
+	public static boolean canBeDeserializated(String msg) {
 		if (classNames == null) {
-			init();
+			try {
+				init();
+				String type = new JSONObject(msg).getString("type");
+				return classNames.contains(type);
+			}
+			catch (NullPointerException e) {
+				e.printStackTrace();
+			}
+			catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
-		String type = new JSONObject(msg).getString("type");
-		return classNames.contains(type);
+		return false;
 	}
 
 	public static DCObject convertToObject(String msg) throws IOException, JsonConvertException {
@@ -37,9 +48,6 @@ public class JsonConverter {
 			}
 		}
 		catch (NullPointerException e) {
-			throw new JsonConvertException(e);
-		}
-		catch (ClassNotFoundException e) {
 			throw new JsonConvertException(e);
 		}
 		throw new JsonConvertException("Cannot be deserializated");

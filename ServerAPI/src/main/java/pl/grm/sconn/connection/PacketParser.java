@@ -29,7 +29,7 @@ public class PacketParser {
 			return dcObj.getUser();
 		}
 		catch (IOException e) {
-			throw new JsonConvertException(e);
+			throw new JsonConvertException("While receiving userdata\n" + e);
 		}
 	}
 
