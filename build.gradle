@@ -21,7 +21,7 @@ subprojects {
     compile group: 'org.json', name: 'json', version: '20141113'
     compile group: 'mysql',name: 'mysql-connector-java', version: '5.1.35'
     compile group: 'org.ini4j', name: 'ini4j', version: '0.5.4'
-    testCompile 'junit:junit:4.4'
+    testCompile 'junit:junit:4.12'
   }
 }
 

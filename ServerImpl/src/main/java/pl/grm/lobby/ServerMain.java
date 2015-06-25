@@ -3,6 +3,8 @@
  */
 package pl.grm.lobby;
 
+import pl.grm.lobby.server.CLogger;
+
 /**
  * @author Levvy055
  *

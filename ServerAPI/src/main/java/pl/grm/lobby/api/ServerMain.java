@@ -5,10 +5,10 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.*;
 
-import pl.grm.lobby.*;
-import pl.grm.lobby.commands.*;
-import pl.grm.lobby.connection.*;
-import pl.grm.lobby.gui.ServerGUI;
+import pl.grm.lobby.server.*;
+import pl.grm.lobby.server.commands.*;
+import pl.grm.lobby.server.connection.*;
+import pl.grm.lobby.server.gui.ServerGUI;
 
 public class ServerMain extends Observable {
 
